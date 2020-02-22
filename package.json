@@ -1,0 +1,73 @@
+{
+  "name": "Observideo",
+  "homepage": "https://observideo.com",
+  "version": "1.0.0",
+  "description": "Observideo is an app for categorizing video segments",
+  "main": "resources/main.js",
+  "scripts": {
+    "postinstall": "electron-builder install-app-deps",
+    "dev": "./node_modules/.bin/shadow-cljs watch main renderer",
+    "build": "./node_modules/.bin/shadow-cljs compile main renderer",
+    "release": "./node_modules/.bin/shadow-cljs release main renderer",
+    "pom": "./node_modules/.bin/shadow-cljs pom",
+    "clean": "rm -rf resources/public/js/* && rm -rf target",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist-mwl": "electron-builder -mwl"
+  },
+  "build": {
+    "appId": "com.observideo.app",
+    "mac": {
+      "category": "public.app-category.education"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {}
+  },
+  "keywords": [],
+  "author": "Miguel Ping <miguel.ping@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "7.1.7",
+    "electron-builder": "^21.2.0",
+    "source-map-support": "^0.4.18",
+    "ws": "^3.2.0",
+    "shadow-cljs": "^2.2.16"
+  },
+  "dependencies": {
+    "antd": "^3.26.9",
+    "create-react-class": "^15.6.2",
+    "fast-glob": "^3.1.1",
+    "ffmpeg-static-electron": "^2.0.1",
+    "ffprobe-static-electron": "^2.0.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "highlight.js": "^9.15.10",
+    "nedb": "^1.8.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.12.0",
+    "react-flip-move": "^3.0.2",
+    "react-highlight.js": "^1.0.7"
+  }
+}
