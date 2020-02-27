@@ -1,15 +1,17 @@
 (ns observideo.renderer.events
   (:require
-   [re-frame.core :as rf :refer [reg-event-db reg-event-fx inject-cofx path after]]
-   [cljs.spec.alpha :as s]))
+    [re-frame.core :as rf :refer [reg-event-db reg-event-fx inject-cofx path after]]
+    [cljs.spec.alpha :as s]))
 
 
 (defn empty-db []
-  {:ui/tab             :settings
-   :ui/timestamp       (str (js/Date.))
+  {:ui/tab               :videos
+   :ui/timestamp         (str (js/Date.))
 
-   :main/videos-folder nil
-   :main/videos-list nil})
+   :videos/videos-folder nil
+   :videos/videos-list   nil
+   :videos/current       nil})
+
 
 (rf/reg-event-db
   :initialize
@@ -17,11 +19,11 @@
 
 (rf/reg-event-db
   :ui/update-videos-folder
-  (fn [db [_ folder]] (assoc db :main/videos-folder folder)))
+  (fn [db [_ folder]] (assoc db :videos/videos-folder folder)))
 
 (rf/reg-event-db
   :main/update-videos
-  (fn [db [_ {:keys [folder videos]}]] (assoc db :main/videos-folder folder :main/videos-list videos)))
+  (fn [db [_ {:keys [folder videos]}]] (assoc db :videos/videos-folder folder :videos/videos-list videos)))
 
 (rf/reg-event-db
   :ui/change-active-tab

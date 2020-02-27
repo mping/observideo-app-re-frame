@@ -41,9 +41,13 @@
   (let [info (js->clj val :keywordize-keys true)]
     (r/as-element [:span (:a info)])))
 
+(defn render-actions [_ record]
+  (r/as-element [antd/button {:type "primary" :icon "edit" :size "small" :onClick #(js/console.log record)}
+                 "edit"]))
+
 (defn videos-list []
-  (let [folder @(rf/subscribe [:main/videos-folder])
-        videos @(rf/subscribe [:main/videos-list])]
+  (let [folder @(rf/subscribe [:videos/videos-folder])
+        videos @(rf/subscribe [:videos/videos-list])]
     [antd/table {:dataSource videos
                  :rowKey     :filename
                  :size       "small"
@@ -53,7 +57,13 @@
      [antd/column {:title "File" :dataIndex :filename :key :filename :render render-filename}]
      [antd/column {:title "Size" :dataIndex :size :key :size :render render-size}]
      [antd/column {:title "Info" :dataIndex :info :key :info :render render-info}]
-     [antd/column {:title "Duration" :dataIndex :duration :key :duration :render render-duration}]]))
+     [antd/column {:title "Duration" :dataIndex :duration :key :duration :render render-duration}]
+     [antd/column {:title     "Actions"
+                   :dataIndex :action
+                   :key       :action
+                   :render    render-actions}]]))
+
+
 
 (defn video-edit []
   [:h1 "Video"])

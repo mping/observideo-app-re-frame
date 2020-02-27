@@ -107,7 +107,7 @@
 
 (defn init-browser []
   (reset! main-window (BrowserWindow.
-                        (clj->js {:width 700
+                        (clj->js {:width 9000
                                   :height 600})))
   ; Path is relative to the compiled js file (main.js in our case)
   (.loadURL @main-window (str "file://" js/__dirname "/public/index.html"))
@@ -115,11 +115,12 @@
 
 (defn main []
   ; CrashReporter can just be omitted
+  #_
   (.start crashReporter
           (clj->js
-            {:companyName "MyAwesomeCompany"
-             :productName "MyAwesomeApp"
-             :submitURL "https://example.com/submit-url"
+            {:companyName "Observideo"
+             :productName "ObservideoApp"
+             :submitURL "https://observideo.com/submit-url"
              :autoSubmit false}))
 
   (.on app "window-all-closed" #(when-not (= js/process.platform "darwin")

@@ -15,7 +15,7 @@
 
 (defn root []
   (let [active @(rf/subscribe [:ui/active-tab])
-        folder @(rf/subscribe [:main/videos-folder])]
+        folder @(rf/subscribe [:videos/videos-folder])]
 
     [antd/layout {:hasSider true}
      [antd/sider {:collapsible true :theme "light"}

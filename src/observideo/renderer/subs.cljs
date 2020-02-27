@@ -10,5 +10,5 @@
 ;;;;
 ;; Main
 
-(rf/reg-sub :main/videos-folder (fn [db _] (:main/videos-folder db)))
-(rf/reg-sub :main/videos-list (fn [db _] (:main/videos-list db)))
+(rf/reg-sub :videos/videos-folder (fn [db _] (:videos/videos-folder db)))
+(rf/reg-sub :videos/videos-list (fn [db _] (:videos/videos-list db)))
