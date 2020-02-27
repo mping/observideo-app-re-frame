@@ -3,7 +3,14 @@
             [observideo.renderer.components.antd :as antd]
             [observideo.renderer.components.settings :as settings]
             [observideo.renderer.components.queries :as queries]
-            [observideo.renderer.components.videos :as videos]))
+            [observideo.renderer.components.videos :as videos]
+            [clojure.string :as s]))
+
+
+(defn- fname [path]
+  ;;TODO use os.separator
+  (subs path (inc (s/last-index-of path "/"))))
+
 
 (defn selected-tab [active]
   (case active
@@ -14,13 +21,15 @@
     [:h1 (str "Unknown: " active)]))
 
 (defn root []
-  (let [active @(rf/subscribe [:ui/active-tab])
-        folder @(rf/subscribe [:videos/videos-folder])]
+  (let [active  @(rf/subscribe [:ui/active-tab])
+        folder  @(rf/subscribe [:videos/folder])
+        current @(rf/subscribe [:videos/current])
+        vname   (:filename current)]
 
     [antd/layout {:hasSider true}
      [antd/sider {:collapsible true :theme "light"}
       [:div.logo
-       [antd/menu {:mode "inline" :theme "light" :defaultSelectedKeys ["settings"]}
+       [antd/menu {:mode "inline" :theme "light" :defaultSelectedKeys [(name active)]}
         [antd/menuitem {:key "videos" :onClick #(rf/dispatch [:ui/change-active-tab :videos])}
          [antd/icon {:type "video-camera"}]
          [:span "Videos"]]
@@ -34,7 +43,10 @@
      [antd/content {:style {:background "#fff" :padding "10px"}}
       [antd/breadcrumb
        [antd/breadcrumb-item active]
-       [antd/breadcrumb-item folder]]
+       [antd/breadcrumb-item
+        [:a {:onClick #(rf/dispatch [:ui/deselect-video])} folder]]
+       (when vname
+         [antd/breadcrumb-item (fname vname)])]
       [(selected-tab active)]]]))
 
 (defn ui

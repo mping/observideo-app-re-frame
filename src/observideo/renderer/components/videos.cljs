@@ -6,7 +6,8 @@
             [goog.object :as gobj]
             [taoensso.timbre :as log]
             [observideo.renderer.ipcrenderer :as ipcrenderer]
-            [observideo.renderer.components.antd :as antd]))
+            [observideo.renderer.components.antd :as antd]
+            [observideo.renderer.components.player :as player]))
 
 
 (defonce electron (js/require "electron"))
@@ -42,12 +43,13 @@
     (r/as-element [:span (:a info)])))
 
 (defn render-actions [_ record]
-  (r/as-element [antd/button {:type "primary" :icon "edit" :size "small" :onClick #(js/console.log record)}
+  (r/as-element [antd/button {:type "primary" :icon "edit" :size "small"
+                              :onClick #(rf/dispatch [:ui/select-video (js->clj record :keywordize-keys true)])}
                  "edit"]))
 
-(defn videos-list []
-  (let [folder @(rf/subscribe [:videos/videos-folder])
-        videos @(rf/subscribe [:videos/videos-list])]
+(defn videos-table []
+  (let [folder @(rf/subscribe [:videos/folder])
+        videos @(rf/subscribe [:videos/list])]
     [antd/table {:dataSource videos
                  :rowKey     :filename
                  :size       "small"
@@ -63,54 +65,26 @@
                    :key       :action
                    :render    render-actions}]]))
 
-
+(defn videos-list []
+  [:div
+   [:p]
+   [antd/button {:type "primary" :icon "upload" :onClick #(select-dir)} "Open a directory"]
+   [videos-table]])
 
 (defn video-edit []
-  [:h1 "Video"])
+  (let [current @(rf/subscribe [:videos/current])]
+    [player/file-player {:url (str "file://" (:filename current))
+                         :controls true
+                         :width "100%"}]))
 
-(defn ui
-  []
-  [:div
-   [:h1 "Videos"]
-   [:div
-    [:p]
-    [antd/button {:type "primary" :icon "upload" :onClick #(select-dir)} "Open a directory"]
-    [videos-list]]])
+(defn show-video-panel [current]
+  (if (some? current)
+    video-edit
+    videos-list))
 
-(comment
-  ;; function-as-a-child render fns
-  (defn render-filename [text record] (dom/span (fname text)))
-  (defn render-size [text record] (dom/span text))
-  (defn render-duration [text record] (dom/span (int text) "s"))
-  (defn render-info [val record]
-    (let [info (js->clj val :keywordize-keys true)]
-      (dom/span (:a info))))
-
-  ;; action component, cannot use render function because we need the `this`
-  (defsc Actions [this {:keys [text record]} {:keys [onClick]}]
-    (antd/button {:type "primary" :icon "edit" :size "small" :onClick onClick}
-      "edit"))
-  (def ui-actions (comp/computed-factory Actions))
-
-  (antd/table
-    {:dataSource list}
-    :rowKey :filename
-    :size "small"
-    :bordered true
-    :pagination {:position "top"}
-    :title #(str "current directory: " id)
-    (antd/column {:title "File" :dataIndex :filename :key :filename :render render-filename})
-    (antd/column {:title "Size" :dataIndex :size :key :size :render render-size})
-    (antd/column {:title "Info" :dataIndex :info :key :info :render render-info})
-    (antd/column {:title "Duration" :dataIndex :duration :key :duration :render render-duration})
-    (antd/column
-      {:title     "Actions"
-       :dataIndex :action
-       :key       :action
-       :render    (fn [text record]
-                    (comp/with-parent-context this
-                      (ui-actions {:text text :record record}
-                        {:onClick #(select-video this (js->clj record :keywordize-keys true))})))})))
+(defn ui []
+  (let [current @(rf/subscribe [:videos/current])]
+    [(show-video-panel current)]))
 
 ;;;;
 ;; components

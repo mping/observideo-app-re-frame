@@ -1,9 +1,7 @@
 (ns observideo.renderer.core
   (:require [reagent.core :as reagent]
             [re-frame.core :as rf]
-            [clojure.string :as str]
             [goog.object :as gobj]
-            ["nedb" :as nedb]
             [devtools.core :as devtools]
             [observideo.renderer.views :refer [ui]]
             [observideo.renderer.subs]
@@ -19,11 +17,13 @@
 
 ;; -- Entry Point -------------------------------------------------------------
 
-(defn ^:export init
-  []
+(defn error-page []
+  [:h1 "ERROR"])
+
+(defn ^:export init []
   (rf/dispatch-sync [:initialize])
   (.on ipcRenderer "event" ipc/handle-message)
   (reagent/render [observideo.renderer.views/ui]
-                  (js/document.getElementById "app-container")))
+                  (js/document.getElementById "app")))
 
 (init)

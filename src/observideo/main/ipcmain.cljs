@@ -56,3 +56,5 @@
           (log/info "Unknow event" event ", type" (type event) ", data" data))))
 
 
+;; TODO use app.getPath to store db
+; https://github.com/electron/electron/blob/master/docs/api/app.md#appgetpathname

@@ -1,7 +1,6 @@
 (ns observideo.renderer.components.antd
-  (:require
-   [reagent.core :as reagent]
-   ["antd" :refer [Layout Menu Breadcrumb Icon Button PageHeader Table Breadcrumb]]))
+  (:require [reagent.core :as reagent]
+            ["antd" :refer [Layout Menu Breadcrumb Icon Button PageHeader Table Breadcrumb]]))
 
 (def layout (reagent/adapt-react-class Layout))
 (def header (reagent/adapt-react-class (.-Header Layout)))
