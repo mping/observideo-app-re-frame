@@ -3,7 +3,6 @@
             [clojure.string :as s]
             [reagent.core :as r]
             [re-frame.core :as rf]
-            [goog.object :as gobj]
             [taoensso.timbre :as log]
             [observideo.renderer.ipcrenderer :as ipcrenderer]
             [observideo.renderer.components.antd :as antd]
@@ -43,10 +42,12 @@
     (r/as-element [:span (:a info)])))
 
 (defn render-actions [_ record]
-  (r/as-element [antd/button {:type "primary" :icon "edit" :size "small"
+  (r/as-element [antd/button {:type "primary" :size "small"
                               :onClick #(rf/dispatch [:ui/select-video (js->clj record :keywordize-keys true)])}
-                 "edit"]))
+                 [antd/edit-icon]
+                 " edit"]))
 
+;;main listing
 (defn videos-table []
   (let [folder @(rf/subscribe [:videos/folder])
         videos @(rf/subscribe [:videos/list])]
@@ -68,14 +69,25 @@
 (defn videos-list []
   [:div
    [:p]
-   [antd/button {:type "primary" :icon "upload" :onClick #(select-dir)} "Open a directory"]
+   [antd/button {:type "primary" :onClick #(select-dir)} 
+    [antd/upload-icon]
+    " Open a directory"]
    [videos-table]])
 
+;; main editing
 (defn video-edit []
-  (let [current @(rf/subscribe [:videos/current])]
-    [player/file-player {:url (str "file://" (:filename current))
-                         :controls true
-                         :width "100%"}]))
+  (let [current  @(rf/subscribe [:videos/current])
+        filename (:filename current)]
+    [:div
+     [antd/row
+      [antd/col {:span 12}
+       [antd/page-header {:title  (fname filename) :subTitle filename
+                          :onBack #(rf/dispatch [:ui/deselect-video])}]
+       [player/file-player {:url      (str "file://" (:filename current))
+                            :controls true
+                            :width    "100%"}]]
+      [antd/col {:span 12}
+       [antd/page-header {:title "Template"}]]]]))
 
 (defn show-video-panel [current]
   (if (some? current)

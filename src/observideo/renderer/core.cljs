@@ -17,9 +17,6 @@
 
 ;; -- Entry Point -------------------------------------------------------------
 
-(defn error-page []
-  [:h1 "ERROR"])
-
 (defn ^:export init []
   (rf/dispatch-sync [:initialize])
   (.on ipcRenderer "event" ipc/handle-message)

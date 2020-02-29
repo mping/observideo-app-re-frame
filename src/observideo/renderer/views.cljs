@@ -1,5 +1,5 @@
 (ns observideo.renderer.views
-  (:require [re-frame.core :as rf :refer [subscribe dispatch]]
+  (:require [re-frame.core :as rf]
             [observideo.renderer.components.antd :as antd]
             [observideo.renderer.components.settings :as settings]
             [observideo.renderer.components.queries :as queries]
@@ -27,25 +27,26 @@
         vname   (:filename current)]
 
     [antd/layout {:hasSider true}
-     [antd/sider {:collapsible true :theme "light"}
+     [antd/sider {:collapsible false :collapsed true :theme "light"}
       [:div.logo
        [antd/menu {:mode "inline" :theme "light" :defaultSelectedKeys [(name active)]}
         [antd/menuitem {:key "videos" :onClick #(rf/dispatch [:ui/change-active-tab :videos])}
-         [antd/icon {:type "video-camera"}]
+         [antd/videos-icon]
          [:span "Videos"]]
         [antd/menuitem {:key "settings" :onClick #(rf/dispatch [:ui/change-active-tab :settings])}
-         [antd/icon {:type "setting"}]
+         [antd/settings-icon]
          [:span "Settings"]]
         [antd/menuitem {:key "queries" :onClick #(rf/dispatch [:ui/change-active-tab :queries])}
-         [antd/icon {:type "bar-chart"}]
+         [antd/queries-icon]
          [:span "Queries"]]]]]
-
+     
      [antd/content {:style {:background "#fff" :padding "10px"}}
       [antd/breadcrumb
        [antd/breadcrumb-item active]
-       [antd/breadcrumb-item
-        [:a {:onClick #(rf/dispatch [:ui/deselect-video])} folder]]
-       (when vname
+       (when (= :videos active)
+         [antd/breadcrumb-item
+          [:a {:onClick #(rf/dispatch [:ui/deselect-video])} folder]])
+       (when (and (= :videos active) vname)
          [antd/breadcrumb-item (fname vname)])]
       [(selected-tab active)]]]))
 

@@ -1,10 +1,10 @@
 ;; shadow-cljs configuration
 {:source-paths ["src"]
 
- :dependencies [[org.clojure/clojurescript "1.10.520"]
+ :dependencies [;[org.clojure/clojurescript "1.10.520"]
+                ;[thheller/shadow-cljs "2.8.83"]
                 [org.clojure/core.async "0.4.490"]
                 [com.taoensso/timbre "4.10.0"]
-                [thheller/shadow-cljs "2.8.83"]
                 [binaryage/devtools "0.9.10"]
                 [reagent "0.8.1"]
                 [re-frame "0.10.5"]
@@ -32,5 +32,5 @@
                                               :before-load observideo.renderer.core/stop
                                               :after-load  observideo.renderer.core/start
                                               :preloads    [devtools.preload
-                                                            day8.re-frame.trace.preload]}}}}
+                                                            day8.re-frame-10x.preload]}}}}
 

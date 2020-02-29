@@ -80,15 +80,17 @@
     (.setApplicationMenu menu (.buildFromTemplate menu template))))
 
 (defn- init-db []
-  (let [sample-path (str homedir "/Downloads")]
+  (let [db-path     (.getPath app "userData")
+        sample-path (.getPath app "downloads")]
     (-> (media/read-dir sample-path)
-      (.then #(ipc/send-message @contents :main->update-videos {:videos % :folder sample-path})))))
+        (.then #(ipc/send-message @contents :main->update-videos {:videos % :folder sample-path})))))
 
 
 (defn- init-browser-window []
   (reset! main-window (browser-window.
                         (clj->js (merge {:width          800
                                          :height         600
+                                         :icon           (str js/__dirname "/public/img/computer.png")
                                          :webPreferences {:nodeIntegration true}
                                          :resizable      true}))))
 
@@ -102,8 +104,8 @@
 
 (defn init []
   (init-menu)
-  (init-db)
-  (init-browser-window))
+  (init-browser-window)
+  (init-db))
 
 (defn init-browser []
   (reset! main-window (BrowserWindow.

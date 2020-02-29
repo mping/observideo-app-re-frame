@@ -52,21 +52,21 @@
   "devDependencies": {
     "electron": "7.1.7",
     "electron-builder": "^21.2.0",
+    "shadow-cljs": "^2.8.89",
     "source-map-support": "^0.4.18",
-    "ws": "^3.2.0",
-    "shadow-cljs": "^2.2.16"
+    "ws": "^3.2.0"
   },
   "dependencies": {
-    "antd": "^3.26.9",
+    "antd": "^4.0.0",
     "create-react-class": "^15.6.2",
-    "fast-glob": "^3.1.1",
+    "fast-glob": "^3.2.2",
     "ffmpeg-static-electron": "^2.0.1",
     "ffprobe-static-electron": "^2.0.0",
     "fluent-ffmpeg": "^2.1.2",
-    "highlight.js": "^9.15.10",
-    "react": "^16.2.0",
-    "react-dom": "^16.12.0",
-    "react-flip-move": "^3.0.2",
+    "highlight.js": "^9.18.1",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0",
+    "react-flip-move": "^3.0.4",
     "react-highlight.js": "^1.0.7",
     "react-player": "^1.15.2"
   }

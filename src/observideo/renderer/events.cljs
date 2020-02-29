@@ -1,6 +1,6 @@
 (ns observideo.renderer.events
   (:require
-   [re-frame.core :as rf :refer [reg-event-db reg-event-fx inject-cofx path after]]
+   [re-frame.core :as rf]
    [cljs.spec.alpha :as s]))
 
 
