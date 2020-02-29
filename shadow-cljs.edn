@@ -1,8 +1,8 @@
 ;; shadow-cljs configuration
 {:source-paths ["src"]
 
- :dependencies [;[org.clojure/clojurescript "1.10.520"]
-                ;[thheller/shadow-cljs "2.8.83"]
+ :dependencies [[org.clojure/clojurescript "1.10.520"]
+                [thheller/shadow-cljs "2.8.83"]
                 [org.clojure/core.async "0.4.490"]
                 [com.taoensso/timbre "4.10.0"]
                 [binaryage/devtools "0.9.10"]

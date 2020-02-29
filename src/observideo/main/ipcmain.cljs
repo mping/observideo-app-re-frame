@@ -1,6 +1,7 @@
 (ns observideo.main.ipcmain
   (:require 
    [observideo.main.media :as media]
+   [observideo.main.db :as db]
    [taoensso.timbre :as log]
    ["electron" :as electron :refer [BrowserWindow remote app ipcRender ipcMain]]
    ["path" :as path]
@@ -31,30 +32,33 @@
 ;;;;
 ;; IPC
 
-
 (defn send-message 
   ([event data]
    (send-message (web-contents (current-window-id)) event data))
   ([webcontents event data]
-   (log/info (str "[main] send " event) data)
+   (log/infof "[main]-> [%s] %s" event data)
    (.send webcontents "event" (clj->js {:event (subs (str event) 1) :data data}))))
 
-
 ;; called when the renderer received an ipc message
-(defn handle-message [evt js-data]
-  (let [original-sender      (.-sender evt)
-        {:keys [event data]} (js->clj js-data :keywordize-keys true)]
-    (log/infof "[main][%s]" event data)
+(defmulti handle (fn [event _ _] event) :default :unknown)
 
-    (cond (= "ui/update-videos-folder" event)
-          (let [folder (:folder data)]
-            (js/console.log "update vids" folder)
-            (-> (media/read-dir folder)
-                (.then #(send-message original-sender :main/update-videos {:videos % :folder folder}))))
-
-          :else
-          (log/info "Unknow event" event ", type" event ", data" data))))
+(defmethod handle :ui/update-videos-folder [_ sender data]
+  (let [folder (:folder data)]
+    (-> (media/read-dir folder)
+        (.then #(send-message sender :main/update-videos {:videos % :folder folder})))))
 
 
-;; TODO use app.getPath to store db
-; https://github.com/electron/electron/blob/master/docs/api/app.md#appgetpathname
+(defmethod handle :ui/ready [event sender data]
+  (js/console.log "READY" data)
+  (db/init))
+
+(defmethod handle :unknown [event sender data]
+  (js/console.log "UNKNOWN" event))
+
+;; main handler
+(defn handle-message [evt jsdata]
+  (let [sender      (.-sender evt)
+        datum (js->clj jsdata :keywordize-keys true)
+        {:keys [event data]} datum]
+    (log/infof "[rend]<- [%s] %s" (keyword event) data)
+    (handle (keyword event) sender data)))

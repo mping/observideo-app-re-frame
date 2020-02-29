@@ -23,6 +23,6 @@
   (reagent/render [observideo.renderer.views/ui]
                   (js/document.getElementById "app"))
   (.on ipcRenderer "event" ipc/handle-message)
-  (ipcrenderer/send-message :ready nil))
+  (ipcrenderer/send-message :ui/ready nil))
 
 (init)

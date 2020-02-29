@@ -79,13 +79,6 @@
                    clj->js)]
     (.setApplicationMenu menu (.buildFromTemplate menu template))))
 
-(defn- init-db []
-  (let [db-path     (.getPath app "userData")
-        sample-path (.getPath app "downloads")]
-    (-> (media/read-dir sample-path)
-        (.then #(ipc/send-message @contents :main/update-videos {:videos % :folder sample-path})))))
-
-
 (defn- init-browser-window []
   (reset! main-window (browser-window.
                         (clj->js (merge {:width          800
@@ -104,8 +97,7 @@
 
 (defn init []
   (init-menu)
-  (init-browser-window)
-  (init-db))
+  (init-browser-window))
 
 (defn init-browser []
   (reset! main-window (BrowserWindow.
