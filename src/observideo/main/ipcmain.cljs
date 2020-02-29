@@ -37,23 +37,23 @@
    (send-message (web-contents (current-window-id)) event data))
   ([webcontents event data]
    (log/info (str "[main] send " event) data)
-   (.send webcontents "event" (clj->js {:event event :data data}))))
+   (.send webcontents "event" (clj->js {:event (subs (str event) 1) :data data}))))
 
 
 ;; called when the renderer received an ipc message
 (defn handle-message [evt js-data]
   (let [original-sender      (.-sender evt)
         {:keys [event data]} (js->clj js-data :keywordize-keys true)]
-    (log/info "[main][" event "]" js-data)
+    (log/infof "[main][%s]" event data)
 
-    (cond (= "update-videos-folder" event)
+    (cond (= "ui/update-videos-folder" event)
           (let [folder (:folder data)]
             (js/console.log "update vids" folder)
             (-> (media/read-dir folder)
-                (.then #(send-message original-sender :main->update-videos {:videos % :folder folder}))))
+                (.then #(send-message original-sender :main/update-videos {:videos % :folder folder}))))
 
           :else
-          (log/info "Unknow event" event ", type" (type event) ", data" data))))
+          (log/info "Unknow event" event ", type" event ", data" data))))
 
 
 ;; TODO use app.getPath to store db

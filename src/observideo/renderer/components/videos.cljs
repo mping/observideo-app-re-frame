@@ -27,9 +27,9 @@
     (.then prm (fn [arg]
                  (let [fps (aget arg "filePaths")
                        [dir] fps]
-                   ;; TODO then?
-                   (ipcrenderer/send-message :update-videos-folder {:folder dir})
-                   #(rf/dispatch [:main/update-videos-folder {:folder dir}]))))))
+                   ;; TODO then? catch exceptions when user cancels?
+                   (ipcrenderer/send-message :ui/update-videos-folder {:folder dir})
+                   #(rf/dispatch [:ui/update-videos-folder {:folder dir}]))))))
 
 ;;;;
 ;; UI

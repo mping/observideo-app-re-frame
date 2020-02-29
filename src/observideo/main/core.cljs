@@ -83,7 +83,7 @@
   (let [db-path     (.getPath app "userData")
         sample-path (.getPath app "downloads")]
     (-> (media/read-dir sample-path)
-        (.then #(ipc/send-message @contents :main->update-videos {:videos % :folder sample-path})))))
+        (.then #(ipc/send-message @contents :main/update-videos {:videos % :folder sample-path})))))
 
 
 (defn- init-browser-window []

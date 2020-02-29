@@ -10,7 +10,7 @@
 (defn dispatch-timer-event
   []
   (let [now (js/Date.)]
-    (rf/dispatch [:timer now])))  ;; <-- dispatch used
+    (rf/dispatch [:timer now])))                            ;; <-- dispatch used
 
 ;; Call the dispatching function every second.
 ;; `defonce` is like `def` but it ensures only one instance is ever
@@ -29,18 +29,23 @@
 
 ;; post messages from renderer to main
 (defn send-message [event data]
-  (.send ipcRenderer "event" (clj->js {:event event :data data})))
+  (log/infof "Sending [%s] %s" event data)
+  (.send ipcRenderer "event" (clj->js {:event (subs (str event) 1) :data data})))
 
 ;; called when the renderer received an ipc message
-(defn handle-message [_ js-data]
-  (let [{:keys [event data]} (js->clj js-data :keywordize-keys true)]
-    (log/info event data)
+(defmulti handle (fn [_ event _] event) :default :unknown)
 
-    (cond (= "main->update-videos" event)
-          (let [videos (:videos data)
-                folder (:folder data)]
-            (rf/dispatch [:main/update-videos {:videos videos :folder folder}]))
+(defmethod handle :main/update-videos [channel event data]
+  (let [videos (:videos data)
+        folder (:folder data)]
+    (rf/dispatch [:main/update-videos {:videos videos :folder folder}])))
 
-          :else
-          (log/warn "Unknown event" event data))))
+(defmethod handle :unknown [channel event data]
+  (js/console.log "UNKNOWN" channel event data))
 
+;; main handler
+(defn handle-message [channel jsdata]
+  (let [datum (js->clj jsdata :keywordize-keys true)
+        {:keys [event data]} datum]
+    (log/infof "[%s] %s" event data datum)
+    (handle channel (keyword event) data)))
