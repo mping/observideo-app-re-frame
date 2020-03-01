@@ -17,9 +17,11 @@
 
 (rf/reg-event-db
   :db/initialize
-  ;[interceptors/ipc2main-interceptor]
   (fn [_ _] (empty-db)))
 
+(rf/reg-event-db
+  :db/load
+  (fn [db server-db] (merge db server-db)))
 
 ;;;;
 ;; IPC events
@@ -28,12 +30,15 @@
   :main/update-videos
   (fn [db [_ {:keys [folder videos]}]] (assoc db :videos/folder folder :videos/list videos)))
 
-(rf/reg-event-db
-  :main/load-db
-  (fn [db server-db] (merge db server-db)))
-
 ;;;;
 ;; User events
+
+
+(rf/reg-event-db
+  :ui/ready
+  [interceptors/ipc2main-interceptor]
+  (fn [db _] db))
+
 
 (rf/reg-event-db
   :ui/update-videos-folder

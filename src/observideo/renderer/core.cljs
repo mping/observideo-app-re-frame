@@ -22,6 +22,7 @@
   (rf/dispatch-sync [:db/initialize])
   (reagent/render [observideo.renderer.views/ui]
                   (js/document.getElementById "app"))
+  (rf/dispatch [:ui/ready])
   (.on ipcRenderer "event" ipc/handle-message))
 
 (init)
