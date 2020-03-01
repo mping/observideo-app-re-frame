@@ -26,15 +26,6 @@
 (defonce contents (atom nil))
 
 ;;;;
-;; commands
-
-(defn- select-dir []
-  (let [opts (clj->js {:properties ["openDirectory"]})
-        dir  (.showOpenDialog dialog @main-window opts)]
-    (ipc/send-message :open-directory dir)))
-
-
-;;;;
 ;; menu
 
 (defn- init-menu
@@ -96,7 +87,8 @@
   (reset! contents (.-webContents @main-window)))
 
 (defn init []
-  (init-menu)
+  ;(init-menu)
+  (.setApplicationMenu menu nil)
   (init-browser-window))
 
 (defn init-browser []

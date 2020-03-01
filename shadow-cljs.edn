@@ -3,7 +3,7 @@
 
  :dependencies [[org.clojure/clojurescript "1.10.520"]
                 [thheller/shadow-cljs "2.8.83"]
-                [org.clojure/core.async "0.4.490"]
+                [funcool/promesa "5.1.0"]
                 [com.taoensso/timbre "4.10.0"]
                 [binaryage/devtools "0.9.10"]
                 [reagent "0.8.1"]
@@ -29,8 +29,8 @@
                                               :closure-defines  {re-frame.trace.trace-enabled? true}}
 
                            :devtools         {:use-document-host false
-                                              :before-load observideo.renderer.core/stop
-                                              :after-load  observideo.renderer.core/start
-                                              :preloads    [devtools.preload
-                                                            day8.re-frame-10x.preload]}}}}
+                                              :before-load       observideo.renderer.core/stop
+                                              :after-load        observideo.renderer.core/start
+                                              :preloads          [devtools.preload
+                                                                  day8.re-frame-10x.preload]}}}}
 

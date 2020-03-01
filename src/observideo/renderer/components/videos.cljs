@@ -1,6 +1,6 @@
 (ns observideo.renderer.components.videos
-  (:require [cljs.core.async :as async :refer [go <! put!]]
-            [clojure.string :as s]
+  (:require [clojure.string :as s]
+            [promesa.core :as p]
             [reagent.core :as r]
             [re-frame.core :as rf]
             [taoensso.timbre :as log]
@@ -22,14 +22,12 @@
 
 (defn- select-dir []
   (let [opts (clj->js {:properties ["openDirectory"]})
-        dir  (.showOpenDialog dialog opts)
-        prm  (js/Promise.resolve dir)]                      ;;sometimes dir is a promise, sometimes it is not :\
-    (.then prm (fn [arg]
-                 (let [fps (aget arg "filePaths")
-                       [dir] fps]
-                   ;; TODO then? catch exceptions when user cancels?
-                   (ipcrenderer/send-message :ui/update-videos-folder {:folder dir})
-                   #(rf/dispatch [:ui/update-videos-folder {:folder dir}]))))))
+        dir  (.showOpenDialog dialog opts)]
+    (-> (p/resolved dir)
+      (p/then (fn [arg]
+                (let [[dir] (aget arg "filePaths")]
+                  (rf/dispatch [:ui/update-videos-folder {:folder dir}]))))
+      (p/catch (fn [err] (log/warn err))))))
 
 ;;;;
 ;; UI
@@ -42,7 +40,7 @@
     (r/as-element [:span (:a info)])))
 
 (defn render-actions [_ record]
-  (r/as-element [antd/button {:type "primary" :size "small"
+  (r/as-element [antd/button {:type    "primary" :size "small"
                               :onClick #(rf/dispatch [:ui/select-video (js->clj record :keywordize-keys true)])}
                  [antd/edit-icon]
                  " edit"]))
@@ -69,7 +67,7 @@
 (defn videos-list []
   [:div
    [:p]
-   [antd/button {:type "primary" :onClick #(select-dir)} 
+   [antd/button {:type "primary" :onClick #(select-dir)}
     [antd/upload-icon]
     " Open a directory"]
    [videos-table]])

@@ -19,10 +19,9 @@
 ;; -- Entry Point -------------------------------------------------------------
 
 (defn ^:export init []
-  (rf/dispatch-sync [:initialize])
+  (rf/dispatch-sync [:db/initialize])
   (reagent/render [observideo.renderer.views/ui]
                   (js/document.getElementById "app"))
-  (.on ipcRenderer "event" ipc/handle-message)
-  (ipcrenderer/send-message :ui/ready nil))
+  (.on ipcRenderer "event" ipc/handle-message))
 
 (init)

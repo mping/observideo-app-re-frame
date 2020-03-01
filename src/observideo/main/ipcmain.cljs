@@ -10,6 +10,8 @@
 ;;;;
 ;; utils
 ;; https://github.com/brianium/tomaat/blob/master/src/tomaat/util.cljs
+(def electron (js/require "electron"))
+(def app  (.-app electron))
 
 (defn- browser-window-ctor []
   (or BrowserWindow (.-BrowserWindow remote)))
@@ -42,19 +44,24 @@
 ;; called when the renderer received an ipc message
 (defmulti handle (fn [event _ _] event) :default :unknown)
 
+;;;;
+;; ipc/ui
 (defmethod handle :ui/update-videos-folder [_ sender data]
   (let [folder (:folder data)]
     (-> (media/read-dir folder)
         (.then #(send-message sender :main/update-videos {:videos % :folder folder})))))
 
 
-(defmethod handle :ui/ready [event sender data]
-  (js/console.log "READY" data)
-  (db/init))
+(defmethod handle :ui/ready [event sender data])
+
+;;;;
+;; ipc/ui
+
 
 (defmethod handle :unknown [event sender data]
   (js/console.log "UNKNOWN" event))
 
+;;;;
 ;; main handler
 (defn handle-message [evt jsdata]
   (let [sender      (.-sender evt)

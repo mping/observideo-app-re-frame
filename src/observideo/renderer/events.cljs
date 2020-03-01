@@ -1,7 +1,7 @@
 (ns observideo.renderer.events
   (:require
    [re-frame.core :as rf]
-   [cljs.spec.alpha :as s]))
+   [observideo.renderer.interceptors :as interceptors]))
 
 
 (defn empty-db []
@@ -16,8 +16,10 @@
 ;; Core events
 
 (rf/reg-event-db
-  :initialize
+  :db/initialize
+  ;[interceptors/ipc2main-interceptor]
   (fn [_ _] (empty-db)))
+
 
 ;;;;
 ;; IPC events
@@ -26,12 +28,18 @@
   :main/update-videos
   (fn [db [_ {:keys [folder videos]}]] (assoc db :videos/folder folder :videos/list videos)))
 
+(rf/reg-event-db
+  :main/load-db
+  (fn [db server-db] (merge db server-db)))
+
 ;;;;
 ;; User events
 
 (rf/reg-event-db
   :ui/update-videos-folder
-  (fn [db [_ folder]] (assoc db :videos/folder folder)))
+  [interceptors/ipc2main-interceptor]
+  (fn [db [_ folder]]
+    (assoc db :videos/folder folder)))
 
 (rf/reg-event-db
   :ui/select-video
