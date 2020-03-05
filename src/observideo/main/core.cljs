@@ -1,8 +1,8 @@
 (ns observideo.main.core
   (:require
    [taoensso.timbre :as log]
-   [observideo.main.media :as media]
    [observideo.main.ipcmain :as ipc]
+   [observideo.main.db :as db]
    ["electron" :as electron :refer [ipcMain app BrowserWindow crashReporter]]
    ["path" :as path]
    ["os" :as os]
@@ -68,6 +68,7 @@
 
                    :always
                    clj->js)]
+    ;(.setApplicationMenu menu nil)
     (.setApplicationMenu menu (.buildFromTemplate menu template))))
 
 (defn- init-browser-window []
@@ -86,18 +87,14 @@
     (.. @main-window -webContents openDevTools))
   (reset! contents (.-webContents @main-window)))
 
-(defn init []
-  ;(init-menu)
-  (.setApplicationMenu menu nil)
-  (init-browser-window))
+(defn init-db []
+  (db/init))
 
-(defn init-browser []
-  (reset! main-window (BrowserWindow.
-                        (clj->js {:width 9000
-                                  :height 600})))
-  ; Path is relative to the compiled js file (main.js in our case)
-  (.loadURL @main-window (str "file://" js/__dirname "/public/index.html"))
-  (.on @main-window "closed" #(reset! main-window nil)))
+(defn init []
+  (init-menu)
+  ;(.setApplicationMenu menu nil)
+  (init-db)
+  (init-browser-window))
 
 (defn main []
   ; CrashReporter can just be omitted

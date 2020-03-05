@@ -63,7 +63,7 @@
     "ffmpeg-static-electron": "^2.0.1",
     "ffprobe-static-electron": "^2.0.0",
     "fluent-ffmpeg": "^2.1.2",
-    "highlight.js": "^9.18.1",
+    "highlight.js": "9.15.10",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-flip-move": "^3.0.4",

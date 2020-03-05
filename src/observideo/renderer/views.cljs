@@ -1,7 +1,7 @@
 (ns observideo.renderer.views
   (:require [re-frame.core :as rf]
             [observideo.renderer.components.antd :as antd]
-            [observideo.renderer.components.settings :as settings]
+            [observideo.renderer.components.templates :as templates]
             [observideo.renderer.components.queries :as queries]
             [observideo.renderer.components.videos :as videos]
             [clojure.string :as s]))
@@ -15,7 +15,7 @@
 (defn selected-tab [active]
   (case active
     :queries queries/ui
-    :settings settings/ui
+    :templates templates/ui
     :videos videos/ui
     ;;default
     [:h1 (str "Unknown: " active)]))
@@ -33,9 +33,9 @@
         [antd/menuitem {:key "videos" :onClick #(rf/dispatch [:ui/change-active-tab :videos])}
          [antd/videos-icon]
          [:span "Videos"]]
-        [antd/menuitem {:key "settings" :onClick #(rf/dispatch [:ui/change-active-tab :settings])}
-         [antd/settings-icon]
-         [:span "Settings"]]
+        [antd/menuitem {:key "templates" :onClick #(rf/dispatch [:ui/change-active-tab :templates])}
+         [antd/templates-icon]
+         [:span "Templates"]]
         [antd/menuitem {:key "queries" :onClick #(rf/dispatch [:ui/change-active-tab :queries])}
          [antd/queries-icon]
          [:span "Queries"]]]]]

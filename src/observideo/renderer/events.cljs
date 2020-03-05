@@ -3,14 +3,21 @@
    [re-frame.core :as rf]
    [observideo.renderer.interceptors :as interceptors]))
 
+(def demo-template {:name       "Demo"
+                    :interval   15
+                    :dimensions [{:name "Peer" :values ["Alone" "Adults" "Peers" "Adults and Peers" "N/A"]}
+                                 {:name "Gender" :values ["Same" "Opposite" "Both" "N/A"]}]})
 
 (defn empty-db []
-  {:ui/tab         :videos
-   :ui/timestamp   (str (js/Date.))
+  {:ui/tab            :videos
+   :ui/timestamp      (str (js/Date.))
 
-   :videos/folder  nil
-   :videos/list    nil
-   :videos/current nil})
+   :videos/folder     nil
+   :videos/list       nil
+   :videos/current    nil
+
+   :templates/list    [demo-template]
+   :templates/current [demo-template]})
 
 ;;;;
 ;; Core events

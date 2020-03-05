@@ -1,5 +1,5 @@
 (ns observideo.main.ipcmain
-  (:require 
+  (:require
    [observideo.main.media :as media]
    [observideo.main.db :as db]
    [taoensso.timbre :as log]
@@ -11,22 +11,22 @@
 ;; utils
 ;; https://github.com/brianium/tomaat/blob/master/src/tomaat/util.cljs
 (def electron (js/require "electron"))
-(def app  (.-app electron))
+(def app (.-app electron))
 
 (defn- browser-window-ctor []
   (or BrowserWindow (.-BrowserWindow remote)))
 
 (defn current-window-id []
   (->> (browser-window-ctor)
-      .getFocusedWindow
-      .-id))
+    .getFocusedWindow
+    .-id))
 
 (defn- web-contents
   "Get the webContents of a browser window identified by id"
   [id]
   (->> id
-       (.fromId (browser-window-ctor))
-       .-webContents))
+    (.fromId (browser-window-ctor))
+    .-webContents))
 
 
 ;; see https://github.com/electron/electron/blob/v3.0.16/docs/api/ipc-main.md
@@ -34,7 +34,7 @@
 ;;;;
 ;; IPC
 
-(defn send-message 
+(defn send-message
   ([event data]
    (send-message (web-contents (current-window-id)) event data))
   ([webcontents event data]
@@ -47,13 +47,15 @@
 ;;;;
 ;; ipc/ui
 (defmethod handle :ui/update-videos-folder [_ sender data]
-  (let [folder (:folder data)]
+  (if-let [folder (:folder data)]
+    ;; TODO loading event?
     (-> (media/read-dir folder)
-        (.then #(send-message sender :main/update-videos {:videos % :folder folder})))))
+        (.then #(send-message sender :main/update-videos {:videos % :folder folder})))
+    (log/warnf ":ui/update-videos-folder called with empty folder: %s", data)))
 
 
-(defmethod handle :ui/ready [event sender data])
-
+(defmethod handle :ui/ready [_ sender _]
+  (handle :ui/update-videos-folder sender {:folder (db/read :dir/videos)}))
 ;;;;
 ;; ipc/ui
 
@@ -64,8 +66,8 @@
 ;;;;
 ;; main handler
 (defn handle-message [evt jsdata]
-  (let [sender      (.-sender evt)
-        datum (js->clj jsdata :keywordize-keys true)
+  (let [sender (.-sender evt)
+        datum  (js->clj jsdata :keywordize-keys true)
         {:keys [event data]} datum]
     (log/infof "[rend]<- [%s] %s" (keyword event) data)
     (handle (keyword event) sender data)))

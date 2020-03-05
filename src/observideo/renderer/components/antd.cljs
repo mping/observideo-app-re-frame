@@ -2,11 +2,11 @@
   (:require [reagent.core :as reagent]
             ["antd" :refer [Layout Menu Breadcrumb Icon Button PageHeader Table Breadcrumb
                             Row Col]]
-            ["@ant-design/icons" :refer [VideoCameraOutlined SettingOutlined BarChartOutlined
+            ["@ant-design/icons" :refer [VideoCameraOutlined TagsOutlined BarChartOutlined
                                          UploadOutlined EditOutlined]]))
 
 (def videos-icon (.-render VideoCameraOutlined))
-(def settings-icon (.-render SettingOutlined))
+(def templates-icon (.-render TagsOutlined))
 (def queries-icon (.-render BarChartOutlined))
 
 (def upload-icon (.-render UploadOutlined))
