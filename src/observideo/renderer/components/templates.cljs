@@ -31,21 +31,27 @@
       ;; dynamic fields
       [:table {:style {:width "100%"}}
        [:thead nil
+        ;; col header
         [:tr nil
-         (map (fn [item] [:td item])
-              (concat headers [antd/plus-circle-icon]))]]
+         (concat (map (fn [item]
+                        [:td {:key item}
+                         [antd/input {:value item}]]) headers)
+                 [[:td {}
+                   [antd/button {:type "link"} [antd/plus-circle-icon]]]])]]
+
        [:tbody nil
         [:tr nil
+         ;; attrs list per header
          (for [header headers
                :let [vals (get dims-per-header header)]]
            [:td {:key header :valign "top"}
             [:ul nil
              (for [val vals]
                [:li {:key val}
-                [antd/input {:value val :addonAfter (r/as-element [antd/button {:size "small"} [antd/minus-circle-icon]])}]])
+                [antd/input {:value val :addonAfter (r/as-element [antd/button {:size "small" :type "link"} [antd/minus-circle-icon]])}]])
              [:li
               [antd/button {}
-               [antd/plus-circle-icon]]]]])]]]
+               [antd/plus-icon]]]]])]]]
 
       ;; save button
       [antd/form-item {}

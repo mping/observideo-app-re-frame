@@ -57,7 +57,7 @@
     "ws": "^3.2.0"
   },
   "dependencies": {
-    "antd": "^4.0.0",
+    "antd": "^3.26.9",
     "create-react-class": "^15.6.2",
     "fast-glob": "^3.2.2",
     "ffmpeg-static-electron": "^2.0.1",

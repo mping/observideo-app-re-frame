@@ -2,23 +2,39 @@
   (:require [reagent.core :as reagent]
             ["antd" :refer [Layout Menu Breadcrumb Icon Button PageHeader Table Breadcrumb
                             Row Col
-                            Form Input Slider]]
-            ["@ant-design/icons" :refer [VideoCameraOutlined TagsOutlined BarChartOutlined
-                                         UploadOutlined EditOutlined DeleteOutlined SaveOutlined
-                                         PlusCircleOutlined MinusCircleOutlined MinusOutlined]]))
+                            Form Input Slider Icon]]
+            #_["@ant-design/icons" :refer [VideoCameraOutlined TagsOutlined BarChartOutlined
+                                           UploadOutlined EditOutlined DeleteOutlined SaveOutlined
+                                           PlusCircleOutlined MinusCircleOutlined MinusOutlined PlusOutlined]]))
 
-(def videos-icon (.-render VideoCameraOutlined))
-(def templates-icon (.-render TagsOutlined))
-(def queries-icon (.-render BarChartOutlined))
+(def icon (reagent/adapt-react-class Icon))
 
-(def upload-icon (.-render UploadOutlined))
-(def edit-icon (.-render EditOutlined))
-(def delete-icon (.-render DeleteOutlined))
-(def save-icon (.-render SaveOutlined))
+(defn videos-icon [] [icon {:type "video-camera"}])
+(defn templates-icon [] [icon {:type "tags"}])
+(defn queries-icon [] [icon {:type "bar-chart"}])
+(defn upload-icon [] [icon {:type "upload"}])
+(defn edit-icon [] [icon {:type "edit"}])
+(defn delete-icon [] [icon {:type "delete"}])
+(defn save-icon [] [icon {:type "save"}])
+(defn plus-circle-icon [] [icon {:type "plus-circle"}])
+(defn minus-circle-icon [] [icon {:type "minus-circle"}])
+(defn plus-icon [] [icon {:type "plus"}])
+(defn minus-icon [] [icon {:type "minus"}])
 
-(def plus-circle-icon (.-render PlusCircleOutlined))
-(def minus-circle-icon (.-render MinusCircleOutlined))
-(def minus-icon (.-render MinusOutlined))
+(comment
+  (def videos-icon (.-render VideoCameraOutlined))
+  (def templates-icon (.-render TagsOutlined))
+  (def queries-icon (.-render BarChartOutlined))
+
+  (def upload-icon (.-render UploadOutlined))
+  (def edit-icon (.-render EditOutlined))
+  (def delete-icon (.-render DeleteOutlined))
+  (def save-icon (.-render SaveOutlined))
+
+  (def plus-circle-icon (.-render PlusCircleOutlined))
+  (def minus-circle-icon (.-render MinusCircleOutlined))
+  (def minus-icon (.-render MinusOutlined))
+  (def plus-icon (.-render PlusOutlined)))
 
 (def layout (reagent/adapt-react-class Layout))
 (def row (reagent/adapt-react-class Row))
@@ -41,6 +57,7 @@
 (def form (reagent/adapt-react-class Form))
 (def form-item (reagent/adapt-react-class (aget Form "Item")))
 (def input (reagent/adapt-react-class Input))
+(def input-group (.-Group Input))
 (def slider (reagent/adapt-react-class Slider))
 
 (def breadcrumb (reagent/adapt-react-class Breadcrumb))
