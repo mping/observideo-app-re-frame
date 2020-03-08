@@ -3,7 +3,7 @@
             ["antd" :refer [Layout Menu Breadcrumb Icon Button PageHeader Table Breadcrumb
                             Row Col]]
             ["@ant-design/icons" :refer [VideoCameraOutlined TagsOutlined BarChartOutlined
-                                         UploadOutlined EditOutlined]]))
+                                         UploadOutlined EditOutlined DeleteOutlined]]))
 
 (def videos-icon (.-render VideoCameraOutlined))
 (def templates-icon (.-render TagsOutlined))
@@ -11,6 +11,7 @@
 
 (def upload-icon (.-render UploadOutlined))
 (def edit-icon (.-render EditOutlined))
+(def delete-icon (.-render DeleteOutlined))
 
 (def layout (reagent/adapt-react-class Layout))
 (def row (reagent/adapt-react-class Row))

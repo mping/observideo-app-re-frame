@@ -41,13 +41,13 @@
          [:span "Queries"]]]]]
      
      [antd/content {:style {:background "#fff" :padding "10px"}}
-      [antd/breadcrumb
-       [antd/breadcrumb-item active]
-       (when (= :videos active)
-         [antd/breadcrumb-item
-          [:a {:onClick #(rf/dispatch [:ui/deselect-video])} folder]])
-       (when (and (= :videos active) vname)
-         [antd/breadcrumb-item (fname vname)])]
+      #_[antd/breadcrumb
+         [antd/breadcrumb-item active]
+         (when (= :videos active)
+           [antd/breadcrumb-item
+            [:a {:onClick #(rf/dispatch [:ui/deselect-video])} folder]])
+         (when (and (= :videos active) vname)
+           [antd/breadcrumb-item (fname vname)])]
       [(selected-tab active)]]]))
 
 (defn ui

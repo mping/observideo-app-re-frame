@@ -32,21 +32,21 @@
 ;;;;
 ;; UI
 
-(defn render-filename [text record] (r/as-element [:span (fname text)]))
-(defn render-size [text record] (r/as-element [:span text]))
-(defn render-duration [text record] (r/as-element [:span (int text) "s"]))
-(defn render-info [val record]
+(defn- render-filename [text record] (r/as-element [:span (fname text)]))
+(defn- render-size [text record] (r/as-element [:span text]))
+(defn- render-duration [text record] (r/as-element [:span (int text) "s"]))
+(defn- render-info [val record]
   (let [info (js->clj val :keywordize-keys true)]
     (r/as-element [:span (:a info)])))
 
-(defn render-actions [_ record]
+(defn- render-actions [_ record]
   (r/as-element [antd/button {:type    "primary" :size "small"
                               :onClick #(rf/dispatch [:ui/select-video (js->clj record :keywordize-keys true)])}
                  [antd/edit-icon]
                  " edit"]))
 
 ;;main listing
-(defn videos-table []
+(defn- videos-table []
   (let [folder @(rf/subscribe [:videos/folder])
         videos @(rf/subscribe [:videos/list])]
     [antd/table {:dataSource videos
@@ -64,7 +64,7 @@
                    :key       :action
                    :render    render-actions}]]))
 
-(defn videos-list []
+(defn- videos-list []
   [:div
    [:p]
    [antd/button {:type "primary" :onClick #(select-dir)}
@@ -73,7 +73,7 @@
    [videos-table]])
 
 ;; main editing
-(defn video-edit []
+(defn- video-edit []
   (let [current  @(rf/subscribe [:videos/current])
         filename (:filename current)]
     [:div
@@ -87,46 +87,24 @@
       [antd/col {:span 12}
        [antd/page-header {:title "Template"}]]]]))
 
-(defn show-video-panel [current]
+(defn- show-video-panel [current]
   (if (some? current)
     video-edit
     videos-list))
 
+(defn- breadcrumbs []
+  (let [folder  @(rf/subscribe [:videos/folder])
+        current @(rf/subscribe [:videos/current])
+        vname   (:filename current)]
+    [antd/breadcrumb
+     [antd/breadcrumb-item "videos"]
+     [antd/breadcrumb-item
+      [:a {:onClick #(rf/dispatch [:ui/deselect-video])} folder]]
+     (when vname
+       [antd/breadcrumb-item (fname vname)])]))
+
 (defn ui []
   (let [current @(rf/subscribe [:videos/current])]
-    [(show-video-panel current)]))
-
-;;;;
-;; components
-
-(comment
-
-  (defsc VideoEdit [this {:folder/keys [selected] :as props} computed]
-    {:query [:folder/selected]
-     :ident (fn [] [:component/id ::video-edit])}
-    (when selected
-      (let [{:keys [filename duration]} selected]
-        (log/info props)
-        ; { tags:
-        ;    { major_brand: 'mp42',
-        ;      minor_version: '0',
-        ;      compatible_brands: 'isommp42',
-        ;      creation_time: '2018-08-20 18:07:46' },
-        ;   probe_score: 100,
-        ;   start_time: 0,
-        ;   format_long_name: 'QuickTime / MOV',
-        ;   duration: 11.516667,
-        ;   size: 7690553,
-        ;   filename:
-        ;    '/Users/guidaveiga/Documents/Pictures/VID_20180820_190746.mp4',
-        ;   nb_programs: 0,
-        ;   nb_streams: 2,
-        ;   bit_rate: 5342207,
-        ;   format_name: 'mov,mp4,m4a,3gp,3g2,mj2'
-        ;   info: {map}
-        (dom/li
-          (dom/h5 (fname filename))
-          (dom/h5 (int duration) "s")))))
-
-  (def ui-video-edit (comp/computed-factory VideoEdit {:keyfn :filename})))
-
+    [:div
+     [breadcrumbs]
+     [(show-video-panel current)]]))

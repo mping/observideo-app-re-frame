@@ -17,7 +17,7 @@
    :videos/current    nil
 
    :templates/list    [demo-template]
-   :templates/current [demo-template]})
+   :templates/current nil})
 
 ;;;;
 ;; Core events
@@ -46,7 +46,8 @@
   [interceptors/ipc2main-interceptor]
   (fn [db _] db))
 
-
+;;;;
+;; videos
 (rf/reg-event-db
   :ui/update-videos-folder
   [interceptors/ipc2main-interceptor]
@@ -64,3 +65,21 @@
 (rf/reg-event-db
   :ui/change-active-tab
   (fn [db [_ tab]] (assoc db :ui/tab tab)))
+
+;;;;
+;; templates
+(rf/reg-event-db
+  :ui/edit-template
+  (fn [db [_ template]] (assoc db :templates/current template)))
+
+(rf/reg-event-db
+  :ui/delete-template
+  (fn [db [_ template]] (assoc db :templates/current template)))
+
+(rf/reg-event-db
+  :ui/deselect-template
+  (fn [db [_ _]] (assoc db :templates/current nil)))
+
+(rf/reg-event-db
+  :ui/add-template
+  (fn [db [_ template]] (update-in db [:templates/list] concat [template])))
