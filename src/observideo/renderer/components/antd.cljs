@@ -1,9 +1,11 @@
 (ns observideo.renderer.components.antd
   (:require [reagent.core :as reagent]
             ["antd" :refer [Layout Menu Breadcrumb Icon Button PageHeader Table Breadcrumb
-                            Row Col]]
+                            Row Col
+                            Form Input Slider]]
             ["@ant-design/icons" :refer [VideoCameraOutlined TagsOutlined BarChartOutlined
-                                         UploadOutlined EditOutlined DeleteOutlined]]))
+                                         UploadOutlined EditOutlined DeleteOutlined SaveOutlined
+                                         PlusCircleOutlined MinusCircleOutlined MinusOutlined]]))
 
 (def videos-icon (.-render VideoCameraOutlined))
 (def templates-icon (.-render TagsOutlined))
@@ -12,6 +14,11 @@
 (def upload-icon (.-render UploadOutlined))
 (def edit-icon (.-render EditOutlined))
 (def delete-icon (.-render DeleteOutlined))
+(def save-icon (.-render SaveOutlined))
+
+(def plus-circle-icon (.-render PlusCircleOutlined))
+(def minus-circle-icon (.-render MinusCircleOutlined))
+(def minus-icon (.-render MinusOutlined))
 
 (def layout (reagent/adapt-react-class Layout))
 (def row (reagent/adapt-react-class Row))
@@ -30,6 +37,11 @@
 (def table (reagent/adapt-react-class Table))
 (def columngroup (reagent/adapt-react-class (.-ColumnGroup Table)))
 (def column (reagent/adapt-react-class (.-Column Table)))
+
+(def form (reagent/adapt-react-class Form))
+(def form-item (reagent/adapt-react-class (aget Form "Item")))
+(def input (reagent/adapt-react-class Input))
+(def slider (reagent/adapt-react-class Slider))
 
 (def breadcrumb (reagent/adapt-react-class Breadcrumb))
 (def breadcrumb-item (reagent/adapt-react-class (aget Breadcrumb "Item")))

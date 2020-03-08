@@ -14,5 +14,5 @@
 (rf/reg-sub :videos/list (fn [db _] (:videos/list db)))
 (rf/reg-sub :videos/current (fn [db _] (:videos/current db)))
 
-(rf/reg-sub :templates/list (fn [db _] (:templates/list db)))
+(rf/reg-sub :templates/list (fn [db _] (vals (:templates/list db))))
 (rf/reg-sub :templates/current (fn [db _] (:templates/current db)))

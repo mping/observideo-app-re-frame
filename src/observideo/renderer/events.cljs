@@ -1,22 +1,27 @@
 (ns observideo.renderer.events
   (:require
    [re-frame.core :as rf]
+   ;[day8.re-frame.tracing :refer-macros [fn-traced]]
    [observideo.renderer.interceptors :as interceptors]))
 
-(def demo-template {:name       "Demo"
+(def demo-template {:id         (random-uuid)
+                    :name       "Demo"
                     :interval   15
-                    :dimensions [{:name "Peer" :values ["Alone" "Adults" "Peers" "Adults and Peers" "N/A"]}
-                                 {:name "Gender" :values ["Same" "Opposite" "Both" "N/A"]}]})
+                    :attributes [{:name "Peer" :values ["Alone" "Adults" "Peers" "Adults and Peers" "N/A"]}
+                                 {:name "Gender" :values ["Same" "Opposite" "Both" "N/A"]}
+                                 {:name "Type" :values ["Roleplay" "Rough and Tumble" "Exercise"]}]})
 
 (defn empty-db []
   {:ui/tab            :videos
    :ui/timestamp      (str (js/Date.))
 
+   ;; videos list is a vec because they are in the filesystem
    :videos/folder     nil
    :videos/list       nil
    :videos/current    nil
 
-   :templates/list    [demo-template]
+   ;; templates are keyed by :id because it facilitates CRUD operations
+   :templates/list    {(:id demo-template) demo-template}
    :templates/current nil})
 
 ;;;;
@@ -68,18 +73,27 @@
 
 ;;;;
 ;; templates
+
+(rf/reg-event-db
+  :ui/add-template
+  (fn [db [_ template]]
+    (let [id (or (:id template) (random-uuid))]
+      (assoc-in db [:templates/list id] template))))
+
 (rf/reg-event-db
   :ui/edit-template
   (fn [db [_ template]] (assoc db :templates/current template)))
 
 (rf/reg-event-db
+  :ui/update-template
+  (fn [db [_ template]] (update-in db [:templates/list (:id template)] template)))
+
+(rf/reg-event-db
   :ui/delete-template
-  (fn [db [_ template]] (assoc db :templates/current template)))
+  (fn [db [_ template]]
+    (let [id (:id template)]
+      (dissoc db :templates/list id))))
 
 (rf/reg-event-db
   :ui/deselect-template
   (fn [db [_ _]] (assoc db :templates/current nil)))
-
-(rf/reg-event-db
-  :ui/add-template
-  (fn [db [_ template]] (update-in db [:templates/list] concat [template])))
