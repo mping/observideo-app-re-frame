@@ -5,11 +5,25 @@
             [reagent.core :as r]
             [clojure.string :as str]))
 
+(defn- add-template-col [template])
+
+(defn- delete-template-col [template colindex])
+
+(defn- delete-template-attr [e template name idx]
+  (.preventDefault e)
+  (let [attrs        (:attributes template)
+        vals         (get attrs name)
+        spliced      (vec (concat (subvec vals 0 idx) (subvec vals (inc idx))))
+        new-template (assoc-in template [:attributes name] spliced)]
+    (js/console.log template name idx)
+    (js/console.log new-template)
+    (rf/dispatch [:ui/update-template new-template])))
+
 (defn- template-form []
   (let [template        @(rf/subscribe [:templates/current])
         {:keys [name attributes]} template
-        headers         (map :name attributes)
-        dims-per-header (reduce (fn [acc item] (assoc acc (:name item) (:values item))) {} attributes)]
+        headers         (keys attributes)
+        dims-per-header attributes]
     (js/console.log headers)
     (js/console.log dims-per-header)
 
@@ -36,8 +50,8 @@
          (concat (map (fn [item]
                         [:td {:key item}
                          [antd/input {:value item}]]) headers)
-                 [[:td {}
-                   [antd/button {:type "link"} [antd/plus-circle-icon]]]])]]
+           [[:td {:key "add"}
+             [antd/button {:type "link"} [antd/plus-circle-icon]]]])]]
 
        [:tbody nil
         [:tr nil
@@ -45,13 +59,25 @@
          (for [header headers
                :let [vals (get dims-per-header header)]]
            [:td {:key header :valign "top"}
-            [:ul nil
-             (for [val vals]
-               [:li {:key val}
-                [antd/input {:value val :addonAfter (r/as-element [antd/button {:size "small" :type "link"} [antd/minus-circle-icon]])}]])
-             [:li
-              [antd/button {}
-               [antd/plus-icon]]]]])]]]
+            [:table nil
+             [:tbody nil
+              ;; build an indexed [val, index]
+              (for [pair (zipmap vals (range))
+                    :let [[val i] pair]]
+                [:tr {:key val}
+                 [:td nil
+                  [antd/input {:value      val
+                               :size       "small"
+                               :addonAfter (r/as-element
+                                             [antd/button {:size "small"
+                                                           :type "link"
+                                                           :href "#"
+                                                           :onClick #(delete-template-attr % template header i)}
+                                              [antd/minus-circle-icon]])}]]])
+              [:td nil
+               [:td nil
+                [antd/button {:size "small"}
+                 [antd/plus-icon]]]]]]])]]]
 
       ;; save button
       [antd/form-item {}
@@ -60,8 +86,7 @@
 
 (defn- render-attributes [_ record]
   (let [clj-record (js->clj record :keywordize-keys true)]
-    (js/console.log (:attributes clj-record))
-    (str/join ", " (map :name (:attributes clj-record)))))
+    (str/join ", " (map name (keys (:attributes clj-record))))))
 
 (defn- render-actions [_ record]
   (r/as-element
@@ -75,7 +100,7 @@
 
 (defn- templates-table []
   (let [templates @(rf/subscribe [:templates/list])]
-    [antd/table {:dataSource templates
+    [antd/table {:dataSource (vals templates)
                  :size       "small"
                  :rowKey     :name
                  :bordered   true

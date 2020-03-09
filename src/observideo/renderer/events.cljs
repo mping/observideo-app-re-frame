@@ -7,9 +7,9 @@
 (def demo-template {:id         (random-uuid)
                     :name       "Demo"
                     :interval   15
-                    :attributes [{:name "Peer" :values ["Alone" "Adults" "Peers" "Adults and Peers" "N/A"]}
-                                 {:name "Gender" :values ["Same" "Opposite" "Both" "N/A"]}
-                                 {:name "Type" :values ["Roleplay" "Rough and Tumble" "Exercise"]}]})
+                    :attributes {"Peer"   ["Alone" "Adults" "Peers" "Adults and Peers" "N/A"]
+                                 "Gender" ["Same" "Opposite" "Both" "N/A"]
+                                 "Type"   ["Roleplay" "Rough and Tumble" "Exercise"]}})
 
 (defn empty-db []
   {:ui/tab            :videos
@@ -82,11 +82,16 @@
 
 (rf/reg-event-db
   :ui/edit-template
-  (fn [db [_ template]] (assoc db :templates/current template)))
+  (fn [db [_ template]]
+    (assoc db :templates/current template #_(get-in db [:templates/list (:id template)]))))
 
 (rf/reg-event-db
   :ui/update-template
-  (fn [db [_ template]] (update-in db [:templates/list (:id template)] template)))
+  (fn [db [_ {:keys [id] :as template}]]
+    (js/console.log ">>" id template)
+    (-> db
+      (update-in [:templates/list id] template)
+      #_(update-in [:templates/current] template))))
 
 (rf/reg-event-db
   :ui/delete-template
