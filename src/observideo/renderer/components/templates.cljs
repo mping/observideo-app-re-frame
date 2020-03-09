@@ -5,9 +5,24 @@
             [reagent.core :as r]
             [clojure.string :as str]))
 
-(defn- add-template-col [template])
+;;;;
+;; form evt handlers
+(defn- add-template-col [e template]
+  (.preventDefault e)
+  (let [new-template (update-in template [:attributes] assoc (gensym) ["Some" "Values"])]
+    (rf/dispatch [:ui/update-template new-template])))
 
-(defn- delete-template-col [template colindex])
+(defn- add-template-attr [e template header]
+  (.preventDefault e)
+  (let [current-attrs (get-in template [:attributes header])
+        new-attrs     (vec (conj current-attrs (gensym)))]
+    (let [new-template (assoc-in template [:attributes header] new-attrs)]
+      (rf/dispatch [:ui/update-template new-template]))))
+
+(defn- delete-template-col [e template name]
+  (.preventDefault e)
+  (let [new-template (update-in template [:attributes] dissoc name)]
+    (rf/dispatch [:ui/update-template new-template])))
 
 (defn- delete-template-attr [e template name idx]
   (.preventDefault e)
@@ -15,18 +30,16 @@
         vals         (get attrs name)
         spliced      (vec (concat (subvec vals 0 idx) (subvec vals (inc idx))))
         new-template (assoc-in template [:attributes name] spliced)]
-    (js/console.log template name idx)
-    (js/console.log new-template)
     (rf/dispatch [:ui/update-template new-template])))
+
+;;;;
+;; form
 
 (defn- template-form []
   (let [template        @(rf/subscribe [:templates/current])
         {:keys [name attributes]} template
         headers         (keys attributes)
         dims-per-header attributes]
-    (js/console.log headers)
-    (js/console.log dims-per-header)
-
     [:div
      [antd/page-header {:title  name :subTitle "Edit"
                         :onBack #(rf/dispatch [:ui/deselect-template])}]
@@ -47,11 +60,21 @@
        [:thead nil
         ;; col header
         [:tr nil
-         (concat (map (fn [item]
-                        [:td {:key item}
-                         [antd/input {:value item}]]) headers)
+         (concat (map (fn [header]
+                        [:td {:key header}
+                         [antd/input {:value      header
+                                      :size       "small"
+                                      :addonAfter (r/as-element
+                                                    [antd/button {:size    "small"
+                                                                  :type    "link"
+                                                                  :href    "#"
+                                                                  :onClick #(delete-template-col % template header)}
+                                                     [antd/delete-icon]])}]])
+                   headers)
            [[:td {:key "add"}
-             [antd/button {:type "link"} [antd/plus-circle-icon]]]])]]
+             ;; add a new column
+             [antd/button {:type "link" :onClick #(add-template-col % template)}
+              [antd/plus-circle-icon]]]])]]
 
        [:tbody nil
         [:tr nil
@@ -64,19 +87,21 @@
               ;; build an indexed [val, index]
               (for [pair (zipmap vals (range))
                     :let [[val i] pair]]
-                [:tr {:key val}
-                 [:td nil
+                [:tr {:key (str "row-" i)}
+                 [:td {:key (str "cell-" i)}
                   [antd/input {:value      val
+                               :key        i
                                :size       "small"
                                :addonAfter (r/as-element
-                                             [antd/button {:size "small"
-                                                           :type "link"
-                                                           :href "#"
+                                             [antd/button {:size    "small"
+                                                           :type    "link"
+                                                           :href    "#"
                                                            :onClick #(delete-template-attr % template header i)}
                                               [antd/minus-circle-icon]])}]]])
-              [:td nil
+              [:tr nil
                [:td nil
-                [antd/button {:size "small"}
+                ;; add a new row
+                [antd/button {:size "small" :type "link" :onClick #(add-template-attr % template header)}
                  [antd/plus-icon]]]]]]])]]]
 
       ;; save button
@@ -102,16 +127,13 @@
   (let [templates @(rf/subscribe [:templates/list])]
     [antd/table {:dataSource (vals templates)
                  :size       "small"
-                 :rowKey     :name
+                 :rowKey     "name"
                  :bordered   true
                  :pagination {:position "top"}
                  :title      (constantly "Templates")}
-     [antd/column {:title "Name" :dataIndex :name :key :name}]
-     [antd/column {:title "Attributes" :dataIndex :name :render render-attributes}]
-     [antd/column {:title     "Actions"
-                   :dataIndex :action
-                   :key       :action
-                   :render    render-actions}]]))
+     [antd/column {:title "Name" :dataIndex :name}]
+     [antd/column {:title "Attributes" :render render-attributes}]
+     [antd/column {:title "Actions" :render render-actions}]]))
 
 
 (defn show-template-panel [current]

@@ -90,8 +90,8 @@
   (fn [db [_ {:keys [id] :as template}]]
     (js/console.log ">>" id template)
     (-> db
-      (update-in [:templates/list id] template)
-      #_(update-in [:templates/current] template))))
+      (assoc-in [:templates/list id] template)
+      (assoc-in [:templates/current] template))))
 
 (rf/reg-event-db
   :ui/delete-template
