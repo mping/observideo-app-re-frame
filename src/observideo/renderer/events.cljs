@@ -4,12 +4,13 @@
    ;[day8.re-frame.tracing :refer-macros [fn-traced]]
    [observideo.renderer.interceptors :as interceptors]))
 
-(def demo-template {:id         (random-uuid)
-                    :name       "Demo"
-                    :interval   15
-                    :attributes {"Peer"   ["Alone" "Adults" "Peers" "Adults and Peers" "N/A"]
-                                 "Gender" ["Same" "Opposite" "Both" "N/A"]
-                                 "Type"   ["Roleplay" "Rough and Tumble" "Exercise"]}})
+(def demo-template {:id                 (random-uuid)
+                    :name               "Demo"
+                    :interval           15
+                    :index              0
+                    :attributes         {"Peer"   ["Alone" "Adults" "Peers" "Adults and Peers" "N/A"]
+                                         "Gender" ["Same" "Opposite" "Both" "N/A"]
+                                         "Type"   ["Roleplay" "Rough and Tumble" "Exercise"]}})
 
 (defn empty-db []
   {:ui/tab            :videos
@@ -78,7 +79,8 @@
   :ui/add-template
   (fn [db [_ template]]
     (let [id (or (:id template) (random-uuid))]
-      (assoc-in db [:templates/list id] template))))
+      (-> db
+        (assoc-in [:templates/list id] template)))))
 
 (rf/reg-event-db
   :ui/edit-template
@@ -88,7 +90,6 @@
 (rf/reg-event-db
   :ui/update-template
   (fn [db [_ {:keys [id] :as template}]]
-    (js/console.log ">>" id template)
     (-> db
       (assoc-in [:templates/list id] template)
       (assoc-in [:templates/current] template))))
@@ -97,7 +98,8 @@
   :ui/delete-template
   (fn [db [_ template]]
     (let [id (:id template)]
-      (dissoc db :templates/list id))))
+      (-> db
+        (dissoc :templates/list id)))))
 
 (rf/reg-event-db
   :ui/deselect-template

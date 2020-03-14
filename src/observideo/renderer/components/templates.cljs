@@ -9,20 +9,25 @@
 ;; form evt handlers
 (defn- add-template-col [e template]
   (.preventDefault e)
-  (let [new-template (update-in template [:attributes] assoc (gensym) ["Some" "Values"])]
+  (let [attrname     (str (gensym))
+        new-template (update-in template [:attributes] assoc attrname ["Some" "Values"])]
+    (rf/dispatch [:ui/update-template new-template])))
+
+(defn- delete-template-col [e template name]
+  (.preventDefault e)
+  (let [new-template  (update-in template [:attributes] dissoc name)]
+    (rf/dispatch [:ui/update-template new-template])))
+
+(defn- update-template-col [template name newname]
+  (let [new-template  (update-in template [:attributes] clojure.set/rename-keys {name newname})]
     (rf/dispatch [:ui/update-template new-template])))
 
 (defn- add-template-attr [e template header]
   (.preventDefault e)
   (let [current-attrs (get-in template [:attributes header])
-        new-attrs     (vec (conj current-attrs (gensym)))]
+        new-attrs     (vec (conj current-attrs (str (gensym))))]
     (let [new-template (assoc-in template [:attributes header] new-attrs)]
       (rf/dispatch [:ui/update-template new-template]))))
-
-(defn- delete-template-col [e template name]
-  (.preventDefault e)
-  (let [new-template (update-in template [:attributes] dissoc name)]
-    (rf/dispatch [:ui/update-template new-template])))
 
 (defn- delete-template-attr [e template name idx]
   (.preventDefault e)
@@ -47,7 +52,7 @@
                  :wrapperCol {:span 14}
                  :name       "basic"
                  :size       "small"
-                 :onFinish   #(js/console.log %)}
+                 #_#_:onFinish #(js/console.log %)}
       ;; main name
       [antd/form-item {:label "Template Name" :name "name" :rules [{:required true :message "Field is required"}]}
        [antd/input]]
@@ -63,6 +68,7 @@
          (concat (map (fn [header]
                         [:td {:key header}
                          [antd/input {:value      header
+                                      :onChange   #(update-template-col template header (-> % .-target .-value))
                                       :size       "small"
                                       :addonAfter (r/as-element
                                                     [antd/button {:size    "small"
@@ -80,12 +86,13 @@
         [:tr nil
          ;; attrs list per header
          (for [header headers
-               :let [vals (get dims-per-header header)]]
+               :let [vals  (get dims-per-header header)
+                     pairs (sort-by last (zipmap vals (range)))]]
            [:td {:key header :valign "top"}
             [:table nil
              [:tbody nil
               ;; build an indexed [val, index]
-              (for [pair (zipmap vals (range))
+              (for [pair pairs
                     :let [[val i] pair]]
                 [:tr {:key (str "row-" i)}
                  [:td {:key (str "cell-" i)}
