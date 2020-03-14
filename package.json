@@ -57,17 +57,19 @@
     "ws": "^3.2.0"
   },
   "dependencies": {
-    "antd": "^3.26.9",
+    "antd": "4.0.0-alpha.14",
     "create-react-class": "^15.6.2",
     "fast-glob": "^3.2.2",
     "ffmpeg-static-electron": "^2.0.1",
     "ffprobe-static-electron": "^2.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "highlight.js": "9.15.10",
+    "rc-field-form": "0.0.0-alpha.16",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-flip-move": "^3.0.4",
     "react-highlight.js": "^1.0.7",
-    "react-player": "^1.15.2"
+    "react-player": "^1.15.2",
+    "regenerator-runtime": "^0.13.5"
   }
 }

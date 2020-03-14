@@ -8,6 +8,10 @@
 ;;;;
 ;; form evt handlers
 
+(defn- update-template-name [template newname]
+  (let [new-template (assoc template :name newname)]
+    (rf/dispatch [:ui/update-template new-template])))
+
 ;; cols
 (defn- add-template-col [e template]
   (.preventDefault e)
@@ -51,12 +55,17 @@
 ;;;;
 ;; form
 
+(defn- handle-submit [this evt]
+  (.preventDefault evt)
+  (let [validate-fn (-> this .-refs .-form .-validateFields)]
+    (validate-fn js/console.log js/console.log)))
+
 (defn- template-form []
-  (let [template        @(rf/subscribe [:templates/current])
-        {:keys [name attributes]} template
-        sorted-attrs    (sort-by (fn [[_ v]] (:index v)) attributes)
-        headers         (keys sorted-attrs)
-        dims-per-header attributes]
+  (let [template     @(rf/subscribe [:templates/current])
+        this         (r/current-component)
+        name         (:name template)
+        attributes   (:attributes template)
+        sorted-attrs (sort-by (fn [[_ v]] (:index v)) attributes)]
     [:div
      [antd/page-header {:title  name :subTitle "Edit"
                         :onBack #(rf/dispatch [:ui/deselect-template])}]
@@ -64,10 +73,12 @@
                  :wrapperCol {:span 14}
                  :name       "basic"
                  :size       "small"
-                 #_#_:onFinish #(js/console.log %)}
+                 :ref        "form"
+                 :onSubmit   #(handle-submit this %)}
       ;; main name
       [antd/form-item {:label "Template Name" :name "name" :rules [{:required true :message "Field is required"}]}
-       [antd/input]]
+       [antd/input {:value    name
+                    :onChange #(update-template-name template (-> % .-target .-value))}]]
 
       [antd/form-item {:label "Interval (secs)" :name "interval" :rules [{:required true :message "Field is required"}]}
        [antd/slider {:min 1 :max 60 :defaultValue 15 :tooltipVisible true}]]

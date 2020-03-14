@@ -1,41 +1,45 @@
 (ns observideo.renderer.components.antd
   (:require [reagent.core :as reagent]
+            ["regenerator-runtime/runtime"]
             ["antd" :refer [Layout Menu Breadcrumb Icon Button PageHeader Table Breadcrumb
                             Row Col
                             Form Input Slider Icon]]
-            #_["@ant-design/icons" :refer [VideoCameraOutlined TagsOutlined BarChartOutlined
-                                           UploadOutlined EditOutlined DeleteOutlined SaveOutlined
-                                           PlusCircleOutlined MinusCircleOutlined MinusOutlined PlusOutlined]]))
+            ["@ant-design/icons" :refer [VideoCameraOutlined TagsOutlined BarChartOutlined
+                                         UploadOutlined EditOutlined DeleteOutlined SaveOutlined
+                                         PlusCircleOutlined MinusCircleOutlined MinusOutlined PlusOutlined]]))
 
-(def icon (reagent/adapt-react-class Icon))
-
-(defn videos-icon [] [icon {:type "video-camera"}])
-(defn templates-icon [] [icon {:type "tags"}])
-(defn queries-icon [] [icon {:type "bar-chart"}])
-(defn upload-icon [] [icon {:type "upload"}])
-(defn edit-icon [] [icon {:type "edit"}])
-(defn delete-icon [] [icon {:type "delete"}])
-(defn save-icon [] [icon {:type "save"}])
-(defn plus-circle-icon [] [icon {:type "plus-circle"}])
-(defn minus-circle-icon [] [icon {:type "minus-circle"}])
-(defn plus-icon [] [icon {:type "plus"}])
-(defn minus-icon [] [icon {:type "minus"}])
 
 (comment
-  (def videos-icon (.-render VideoCameraOutlined))
-  (def templates-icon (.-render TagsOutlined))
-  (def queries-icon (.-render BarChartOutlined))
+  (def icon (reagent/adapt-react-class Icon))
+  (defn videos-icon [] [icon {:type "video-camera"}])
+  (defn templates-icon [] [icon {:type "tags"}])
+  (defn queries-icon [] [icon {:type "bar-chart"}])
+  (defn upload-icon [] [icon {:type "upload"}])
+  (defn edit-icon [] [icon {:type "edit"}])
+  (defn delete-icon [] [icon {:type "delete"}])
+  (defn save-icon [] [icon {:type "save"}])
+  (defn plus-circle-icon [] [icon {:type "plus-circle"}])
+  (defn minus-circle-icon [] [icon {:type "minus-circle"}])
+  (defn plus-icon [] [icon {:type "plus"}])
+  (defn minus-icon [] [icon {:type "minus"}]))
 
-  (def upload-icon (.-render UploadOutlined))
-  (def edit-icon (.-render EditOutlined))
-  (def delete-icon (.-render DeleteOutlined))
-  (def save-icon (.-render SaveOutlined))
+;;
+(def videos-icon (.-render VideoCameraOutlined))
+(def templates-icon (.-render TagsOutlined))
+(def queries-icon (.-render BarChartOutlined))
 
-  (def plus-circle-icon (.-render PlusCircleOutlined))
-  (def minus-circle-icon (.-render MinusCircleOutlined))
-  (def minus-icon (.-render MinusOutlined))
-  (def plus-icon (.-render PlusOutlined)))
+(def upload-icon (.-render UploadOutlined))
+(def edit-icon (.-render EditOutlined))
+(def delete-icon (.-render DeleteOutlined))
+(def save-icon (.-render SaveOutlined))
 
+(def plus-circle-icon (.-render PlusCircleOutlined))
+(def minus-circle-icon (.-render MinusCircleOutlined))
+(def minus-icon (.-render MinusOutlined))
+(def plus-icon (.-render PlusOutlined))
+
+;;;;
+;;
 (def layout (reagent/adapt-react-class Layout))
 (def row (reagent/adapt-react-class Row))
 (def col (reagent/adapt-react-class Col))
