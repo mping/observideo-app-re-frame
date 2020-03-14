@@ -7,10 +7,10 @@
 (def demo-template {:id                 (random-uuid)
                     :name               "Demo"
                     :interval           15
-                    :index              0
-                    :attributes         {"Peer"   ["Alone" "Adults" "Peers" "Adults and Peers" "N/A"]
-                                         "Gender" ["Same" "Opposite" "Both" "N/A"]
-                                         "Type"   ["Roleplay" "Rough and Tumble" "Exercise"]}})
+                    :next-index         3 ;;monotonic counter to ensure old indexes preserve their value
+                    :attributes         {"Peer"   {:index 0 :values ["Alone" "Adults" "Peers" "Adults and Peers" "N/A"]}
+                                         "Gender" {:index 1 :values ["Same" "Opposite" "Both" "N/A"]}
+                                         "Type"   {:index 2 :values ["Roleplay" "Rough and Tumble" "Exercise"]}}})
 
 (defn empty-db []
   {:ui/tab            :videos

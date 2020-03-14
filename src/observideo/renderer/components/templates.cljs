@@ -7,34 +7,45 @@
 
 ;;;;
 ;; form evt handlers
+
+;; cols
 (defn- add-template-col [e template]
   (.preventDefault e)
   (let [attrname     (str (gensym))
-        new-template (update-in template [:attributes] assoc attrname ["Some" "Values"])]
+        next-index   (:next-index template)
+        new-template (update-in template [:attributes] assoc attrname {:index next-index :values ["Some" "Values"]})
+        new-template (assoc new-template :next-index (inc next-index))]
     (rf/dispatch [:ui/update-template new-template])))
 
 (defn- delete-template-col [e template name]
   (.preventDefault e)
-  (let [new-template  (update-in template [:attributes] dissoc name)]
+  (let [new-template (update-in template [:attributes] dissoc name)]
     (rf/dispatch [:ui/update-template new-template])))
 
 (defn- update-template-col [template name newname]
-  (let [new-template  (update-in template [:attributes] clojure.set/rename-keys {name newname})]
+  (let [new-template (update-in template [:attributes] clojure.set/rename-keys {name newname})]
     (rf/dispatch [:ui/update-template new-template])))
 
+;; attrs
 (defn- add-template-attr [e template header]
   (.preventDefault e)
-  (let [current-attrs (get-in template [:attributes header])
+  (let [current-attrs (get-in template [:attributes header :values])
         new-attrs     (vec (conj current-attrs (str (gensym))))]
-    (let [new-template (assoc-in template [:attributes header] new-attrs)]
+    (let [new-template (assoc-in template [:attributes header :values] new-attrs)]
       (rf/dispatch [:ui/update-template new-template]))))
 
 (defn- delete-template-attr [e template name idx]
   (.preventDefault e)
   (let [attrs        (:attributes template)
-        vals         (get attrs name)
+        vals         (:values (get attrs name))
         spliced      (vec (concat (subvec vals 0 idx) (subvec vals (inc idx))))
-        new-template (assoc-in template [:attributes name] spliced)]
+        new-template (assoc-in template [:attributes name :values] spliced)]
+    (rf/dispatch [:ui/update-template new-template])))
+
+(defn- update-template-attr [template header index newattrname]
+  (let [values       (get-in template [:attributes header :values])
+        new-values   (assoc values index newattrname)
+        new-template (assoc-in template [:attributes header :values] new-values)]
     (rf/dispatch [:ui/update-template new-template])))
 
 ;;;;
@@ -43,7 +54,8 @@
 (defn- template-form []
   (let [template        @(rf/subscribe [:templates/current])
         {:keys [name attributes]} template
-        headers         (keys attributes)
+        sorted-attrs    (sort-by (fn [[_ v]] (:index v)) attributes)
+        headers         (keys sorted-attrs)
         dims-per-header attributes]
     [:div
      [antd/page-header {:title  name :subTitle "Edit"
@@ -65,18 +77,19 @@
        [:thead nil
         ;; col header
         [:tr nil
-         (concat (map (fn [header]
-                        [:td {:key header}
+         (concat (map (fn [[header v]]
+                        [:td {:key (:index v)}
                          [antd/input {:value      header
                                       :onChange   #(update-template-col template header (-> % .-target .-value))
                                       :size       "small"
+                                      :key        (:index v)
                                       :addonAfter (r/as-element
                                                     [antd/button {:size    "small"
                                                                   :type    "link"
                                                                   :href    "#"
                                                                   :onClick #(delete-template-col % template header)}
                                                      [antd/delete-icon]])}]])
-                   headers)
+                   sorted-attrs)
            [[:td {:key "add"}
              ;; add a new column
              [antd/button {:type "link" :onClick #(add-template-col % template)}
@@ -85,10 +98,10 @@
        [:tbody nil
         [:tr nil
          ;; attrs list per header
-         (for [header headers
-               :let [vals  (get dims-per-header header)
+         (for [[header v] sorted-attrs
+               :let [vals  (:values v)
                      pairs (sort-by last (zipmap vals (range)))]]
-           [:td {:key header :valign "top"}
+           [:td {:key (:index v) :valign "top"}
             [:table nil
              [:tbody nil
               ;; build an indexed [val, index]
@@ -99,6 +112,7 @@
                   [antd/input {:value      val
                                :key        i
                                :size       "small"
+                               :onChange   #(update-template-attr template header i (-> % .-target .-value))
                                :addonAfter (r/as-element
                                              [antd/button {:size    "small"
                                                            :type    "link"
