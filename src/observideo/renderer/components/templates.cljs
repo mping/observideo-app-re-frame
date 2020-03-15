@@ -12,6 +12,10 @@
   (let [new-template (assoc template :name newname)]
     (rf/dispatch [:ui/update-template new-template])))
 
+(defn- update-template-interval [template intv]
+  (let [new-template (assoc template :interval intv)]
+   (rf/dispatch [:ui/update-template new-template])))
+
 ;; cols
 (defn- add-template-col [e template]
   (.preventDefault e)
@@ -55,51 +59,53 @@
 ;;;;
 ;; form
 
-(defn- handle-submit [this evt]
-  (.preventDefault evt)
-  (let [validate-fn (-> this .-refs .-form .-validateFields)]
-    (validate-fn js/console.log js/console.log)))
+(defn- handle-submit [this values]
+  (js/console.log values))
 
 (defn- template-form []
   (let [template     @(rf/subscribe [:templates/current])
         this         (r/current-component)
-        name         (:name template)
+        tmpl-name    (:name template)
+        intv         (:interval template)
         attributes   (:attributes template)
         sorted-attrs (sort-by (fn [[_ v]] (:index v)) attributes)]
     [:div
-     [antd/page-header {:title  name :subTitle "Edit"
+     [antd/page-header {:title  tmpl-name :subTitle "Edit"
                         :onBack #(rf/dispatch [:ui/deselect-template])}]
      [antd/form {:labelCol   {:span 6}
-                 :wrapperCol {:span 14}
+                 :wrapperCol {:span 24}
                  :name       "basic"
                  :size       "small"
                  :ref        "form"
-                 :onSubmit   #(handle-submit this %)}
+                 :onFinish   #(handle-submit this %)}
       ;; main name
       [antd/form-item {:label "Template Name" :name "name" :rules [{:required true :message "Field is required"}]}
-       [antd/input {:value    name
+       [antd/input {:value    tmpl-name
                     :onChange #(update-template-name template (-> % .-target .-value))}]]
 
       [antd/form-item {:label "Interval (secs)" :name "interval" :rules [{:required true :message "Field is required"}]}
-       [antd/slider {:min 1 :max 60 :defaultValue 15 :tooltipVisible true}]]
+       [antd/slider {:min 1
+                     :max 60
+                     :value intv
+                     :key "slider"
+                     :onChange #(update-template-interval template %)}]]
 
       ;; dynamic fields
       [:table {:style {:width "100%"}}
        [:thead nil
         ;; col header
         [:tr nil
-         (concat (map (fn [[header v]]
-                        [:td {:key (:index v)}
-                         [antd/input {:value      header
-                                      :onChange   #(update-template-col template header (-> % .-target .-value))
-                                      :size       "small"
-                                      :key        (:index v)
-                                      :addonAfter (r/as-element
-                                                    [antd/button {:size    "small"
-                                                                  :type    "link"
-                                                                  :href    "#"
-                                                                  :onClick #(delete-template-col % template header)}
-                                                     [antd/delete-icon]])}]])
+         (concat (map-indexed (fn [i [header v]]
+                                [:td {:key (:index v)}
+                                 [antd/input {:value      (name header)
+                                              :onChange   #(update-template-col template header (-> % .-target .-value))
+                                              :size       "small"
+                                              :addonAfter (r/as-element
+                                                            [antd/button {:size    "small"
+                                                                          :type    "link"
+                                                                          :href    "#"
+                                                                          :onClick #(delete-template-col % template header)}
+                                                             [antd/delete-icon]])}]])
                    sorted-attrs)
            [[:td {:key "add"}
              ;; add a new column
@@ -107,12 +113,14 @@
               [antd/plus-circle-icon]]]])]]
 
        [:tbody nil
+        [:tr nil [:td {:colspan 0}] ]
         [:tr nil
          ;; attrs list per header
          (for [[header v] sorted-attrs
                :let [vals  (:values v)
                      pairs (sort-by last (zipmap vals (range)))]]
-           [:td {:key (:index v) :valign "top"}
+           [:td {:key (str "attr" (:index v))
+                 :valign "top"}
             [:table nil
              [:tbody nil
               ;; build an indexed [val, index]
@@ -121,7 +129,7 @@
                 [:tr {:key (str "row-" i)}
                  [:td {:key (str "cell-" i)}
                   [antd/input {:value      val
-                               :key        i
+                               :key        (str header "-input-attr-" i)
                                :size       "small"
                                :onChange   #(update-template-attr template header i (-> % .-target .-value))
                                :addonAfter (r/as-element
