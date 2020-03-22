@@ -3,7 +3,7 @@
             ["regenerator-runtime/runtime"]
             ["antd" :refer [Layout Menu Breadcrumb Icon Button PageHeader Table Breadcrumb
                             Row Col
-                            Form Input Slider Icon]]
+                            Form Select Input Slider Icon]]
             ["@ant-design/icons" :refer [VideoCameraOutlined TagsOutlined BarChartOutlined
                                          UploadOutlined EditOutlined DeleteOutlined SaveOutlined
                                          PlusCircleOutlined MinusCircleOutlined MinusOutlined PlusOutlined]]))
@@ -61,6 +61,8 @@
 (def form (reagent/adapt-react-class Form))
 (def form-item (reagent/adapt-react-class (aget Form "Item")))
 (def input (reagent/adapt-react-class Input))
+(def select (reagent/adapt-react-class Select))
+(def option (reagent/adapt-react-class (aget Select "Option")))
 (def input-group (.-Group Input))
 (def slider (reagent/adapt-react-class Slider))
 

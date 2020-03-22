@@ -32,8 +32,13 @@
 ;;;;
 ;; UI
 
+
+;;;;
+;;main listing
+
 (defn- render-filename [text record] (r/as-element [:span (fname text)]))
 (defn- render-size [text record] (r/as-element [:span text]))
+(defn- render-template [text record] (r/as-element [:span text]))
 (defn- render-duration [text record] (r/as-element [:span (int text) "s"]))
 (defn- render-info [val record]
   (let [info (js->clj val :keywordize-keys true)]
@@ -45,7 +50,6 @@
                  [antd/edit-icon]
                  " edit"]))
 
-;;main listing
 (defn- videos-table []
   (let [folder @(rf/subscribe [:videos/folder])
         videos @(rf/subscribe [:videos/list])]
@@ -57,6 +61,7 @@
                  :title      #(str "current directory: " folder)}
      [antd/column {:title "File" :dataIndex :filename :key :filename :render render-filename}]
      [antd/column {:title "Size" :dataIndex :size :key :size :render render-size}]
+     [antd/column {:title "Template" :dataIndex :template-id :key :template-id :render render-template}]
      [antd/column {:title "Info" :dataIndex :info :key :info :render render-info}]
      [antd/column {:title "Duration" :dataIndex :duration :key :duration :render render-duration}]
      [antd/column {:title     "Actions"
@@ -72,20 +77,35 @@
     " Open a directory"]
    [videos-table]])
 
+;;;;
 ;; main editing
+
+(defn- select-template [video id]
+  (rf/dispatch [:ui/update-current-video-template id])
+  (js/console.log "Select template" video id))
+
 (defn- video-edit []
-  (let [current  @(rf/subscribe [:videos/current])
-        filename (:filename current)]
+  (let [video         @(rf/subscribe [:videos/current])
+        templates     @(rf/subscribe [:templates/list])
+        templates     (vals templates)
+        filename      (:filename video)
+        selected-tmpl (:template video)]
     [:div
      [antd/row
+      ;; left col
       [antd/col {:span 12}
        [antd/page-header {:title  (fname filename) :subTitle filename
                           :onBack #(rf/dispatch [:ui/deselect-video])}]
-       [player/file-player {:url      (str "file://" (:filename current))
+       [player/file-player {:url      (str "file://" (:filename video))
                             :controls true
                             :width    "100%"}]]
+      ;; right col
       [antd/col {:span 12}
-       [antd/page-header {:title "Template"}]]]]))
+       [antd/page-header {:title "Template"}]
+       [antd/select {:defaultValue selected-tmpl :onChange #(select-template video %)}
+        (for [tmpl templates
+              :let [{:keys [id name]} tmpl]]
+          [antd/option {:key id} name])]]]]))
 
 (defn- show-video-panel [current]
   (if (some? current)

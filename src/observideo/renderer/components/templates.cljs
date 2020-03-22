@@ -10,11 +10,11 @@
 
 (defn- update-template-name [template newname]
   (let [new-template (assoc template :name newname)]
-    (rf/dispatch [:ui/update-template new-template])))
+    (rf/dispatch [:ui/update-current-template new-template])))
 
 (defn- update-template-interval [template intv]
   (let [new-template (assoc template :interval intv)]
-   (rf/dispatch [:ui/update-template new-template])))
+   (rf/dispatch [:ui/update-current-template new-template])))
 
 ;; cols
 (defn- add-template-col [e template]
@@ -23,16 +23,16 @@
         next-index   (:next-index template)
         new-template (update-in template [:attributes] assoc attrname {:index next-index :values ["Some" "Values"]})
         new-template (assoc new-template :next-index (inc next-index))]
-    (rf/dispatch [:ui/update-template new-template])))
+    (rf/dispatch [:ui/update-current-template new-template])))
 
 (defn- delete-template-col [e template name]
   (.preventDefault e)
   (let [new-template (update-in template [:attributes] dissoc name)]
-    (rf/dispatch [:ui/update-template new-template])))
+    (rf/dispatch [:ui/update-current-template new-template])))
 
 (defn- update-template-col [template name newname]
   (let [new-template (update-in template [:attributes] clojure.set/rename-keys {name newname})]
-    (rf/dispatch [:ui/update-template new-template])))
+    (rf/dispatch [:ui/update-current-template new-template])))
 
 ;; attrs
 (defn- add-template-attr [e template header]
@@ -40,7 +40,7 @@
   (let [current-attrs (get-in template [:attributes header :values])
         new-attrs     (vec (conj current-attrs (str (gensym))))]
     (let [new-template (assoc-in template [:attributes header :values] new-attrs)]
-      (rf/dispatch [:ui/update-template new-template]))))
+      (rf/dispatch [:ui/update-current-template new-template]))))
 
 (defn- delete-template-attr [e template name idx]
   (.preventDefault e)
@@ -48,19 +48,26 @@
         vals         (:values (get attrs name))
         spliced      (vec (concat (subvec vals 0 idx) (subvec vals (inc idx))))
         new-template (assoc-in template [:attributes name :values] spliced)]
-    (rf/dispatch [:ui/update-template new-template])))
+    (rf/dispatch [:ui/update-current-template new-template])))
 
 (defn- update-template-attr [template header index newattrname]
   (let [values       (get-in template [:attributes header :values])
         new-values   (assoc values index newattrname)
         new-template (assoc-in template [:attributes header :values] new-values)]
-    (rf/dispatch [:ui/update-template new-template])))
+    (rf/dispatch [:ui/update-current-template new-template])))
 
 ;;;;
 ;; form
 
-(defn- handle-submit [this values]
-  (js/console.log values))
+(defn- handle-submit [this values template]
+  (rf/dispatch [:ui/update-template template])
+  (rf/dispatch [:ui/deselect-template]))
+
+(defn- cancel [& args]
+  (rf/dispatch [:ui/deselect-template]))
+
+;;;;
+;;
 
 (defn- template-form []
   (let [template     @(rf/subscribe [:templates/current])
@@ -77,13 +84,13 @@
                  :name       "basic"
                  :size       "small"
                  :ref        "form"
-                 :onFinish   #(handle-submit this %)}
+                 :onFinish   #(handle-submit this % template)}
       ;; main name
-      [antd/form-item {:label "Template Name" :name "name" :rules [{:required true :message "Field is required"}]}
+      [antd/form-item {:label "Template Name" #_#_:rules [{:required true :message "Field is required"}]}
        [antd/input {:value    tmpl-name
                     :onChange #(update-template-name template (-> % .-target .-value))}]]
 
-      [antd/form-item {:label "Interval (secs)" :name "interval" :rules [{:required true :message "Field is required"}]}
+      [antd/form-item {:label "Interval (secs)" #_#_:rules [{:required true :message "Field is required"}]}
        [antd/slider {:min 1
                      :max 60
                      :value intv
@@ -97,15 +104,16 @@
         [:tr nil
          (concat (map-indexed (fn [i [header v]]
                                 [:td {:key (:index v)}
-                                 [antd/input {:value      (name header)
-                                              :onChange   #(update-template-col template header (-> % .-target .-value))
-                                              :size       "small"
-                                              :addonAfter (r/as-element
-                                                            [antd/button {:size    "small"
-                                                                          :type    "link"
-                                                                          :href    "#"
-                                                                          :onClick #(delete-template-col % template header)}
-                                                             [antd/delete-icon]])}]])
+                                 [antd/form-item {#_#_:rules [{:required true :message "Field is required"}]}
+                                  [antd/input {:value      (name header)
+                                               :onChange   #(update-template-col template header (-> % .-target .-value))
+                                               :size       "small"
+                                               :addonAfter (r/as-element
+                                                             [antd/button {:size    "small"
+                                                                           :type    "link"
+                                                                           :href    "#"
+                                                                           :onClick #(delete-template-col % template header)}
+                                                              [antd/delete-icon]])}]]])
                    sorted-attrs)
            [[:td {:key "add"}
              ;; add a new column
@@ -113,7 +121,7 @@
               [antd/plus-circle-icon]]]])]]
 
        [:tbody nil
-        [:tr nil [:td {:colspan 0}] ]
+        [:tr nil [:td {:colspan 0}]]
         [:tr nil
          ;; attrs list per header
          (for [[header v] sorted-attrs
@@ -145,9 +153,15 @@
                  [antd/plus-icon]]]]]]])]]]
 
       ;; save button
-      [antd/form-item {}
-       [antd/button {:type "primary" :htmlType "submit"}
-        [antd/save-icon] " save"]]]]))
+      [:hr nil]
+
+      [antd/button {:type "primary" :htmlType "submit"}
+       [antd/save-icon] " save"]
+      [antd/button {:size    "small"
+                    :type    "link"
+                    :href    "#"
+                    :onClick #(cancel)}
+       "Cancel"]]]))
 
 (defn- render-attributes [_ record]
   (let [clj-record (js->clj record :keywordize-keys true)]

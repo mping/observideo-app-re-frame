@@ -21,11 +21,14 @@
 (.setFfmpegPath ffmpeg-command (.-path ffmpeg-static-electron))
 
 (defn checksum [video]
-  (assoc video :md5sum "changeme"))
+  (assoc video "md5sum" "changeme"))
 
 (defn db-info [video]
   ;; TODO enhance with db info
-  (merge video {:info {:a "changeme"}}))
+  (merge video {"info" {:a "changeme"}}))
+
+(defn filter-keys [video]
+  (select-keys video ["filename" "size" "duration" "info" "md5sum"]))
 
 (defn read-metadata [path]
   (js/Promise. 
@@ -47,6 +50,7 @@
         (.then #(js->clj %))
         (.then #(map checksum %))
         (.then #(map db-info %))
+        (.then #(map filter-keys %))
         (.then #(sort-by :filename %)))))
 
 ;(.ffprobe ffmpeg-command "/Users/guidaveiga/Documents/Pictures/VID_20150606_172227117.mp4"

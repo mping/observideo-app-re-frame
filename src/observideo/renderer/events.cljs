@@ -4,7 +4,9 @@
    ;[day8.re-frame.tracing :refer-macros [fn-traced]]
    [observideo.renderer.interceptors :as interceptors]))
 
-(def demo-template {:id                 (random-uuid)
+(def ^{:private true} demo-id (random-uuid))
+
+(def demo-template {:id                 demo-id
                     :name               "Demo"
                     :interval           15
                     :next-index         3 ;;monotonic counter to ensure old indexes preserve their value
@@ -46,7 +48,6 @@
 ;;;;
 ;; User events
 
-
 (rf/reg-event-db
   :ui/ready
   [interceptors/ipc2main-interceptor]
@@ -54,6 +55,7 @@
 
 ;;;;
 ;; videos
+
 (rf/reg-event-db
   :ui/update-videos-folder
   [interceptors/ipc2main-interceptor]
@@ -72,6 +74,16 @@
   :ui/change-active-tab
   (fn [db [_ tab]] (assoc db :ui/tab tab)))
 
+
+;;;;
+;; video editing
+
+(rf/reg-event-db
+  :ui/update-current-video-template
+  (fn [db [_ id]]
+    (let [current-video (:videos/current db)]
+      (assoc-in db [:videos/current] (assoc current-video :template-id id)))))
+
 ;;;;
 ;; templates
 
@@ -85,13 +97,19 @@
 (rf/reg-event-db
   :ui/edit-template
   (fn [db [_ template]]
-    (assoc db :templates/current template #_(get-in db [:templates/list (:id template)]))))
+    ;; make a copy
+    (assoc db :templates/current (merge {} (get-in db [:templates/list (:id template)])))))
 
 (rf/reg-event-db
   :ui/update-template
   (fn [db [_ {:keys [id] :as template}]]
     (-> db
-      (assoc-in [:templates/list id] template)
+      (assoc-in [:templates/list id] template))))
+
+(rf/reg-event-db
+  :ui/update-current-template
+  (fn [db [_ template]]
+    (-> db
       (assoc-in [:templates/current] template))))
 
 (rf/reg-event-db
