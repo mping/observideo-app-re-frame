@@ -28,7 +28,8 @@
   (merge video {"info" {:a "changeme"}}))
 
 (defn filter-keys [video]
-  (select-keys video ["filename" "size" "duration" "info" "md5sum"]))
+  (-> video
+    (select-keys ["filename" "size" "duration" "info" "md5sum"])))
 
 (defn read-metadata [path]
   (js/Promise. 
