@@ -19,13 +19,13 @@
    :ui/timestamp      (str (js/Date.))
 
    ;; videos list is a vec because they are in the filesystem
-   :videos/folder     nil
-   :videos/list       nil
-   :videos/current    nil
+   :videos/folder     nil ;;string
+   :videos/all       nil ;;map
+   :videos/current    nil ;;map
 
    ;; templates are keyed by :id because it facilitates CRUD operations
-   :templates/list    {(:id demo-template) demo-template}
-   :templates/current nil})
+   :templates/all    {(:id demo-template) demo-template} ;; {uuid -> map}
+   :templates/current nil}) ;;map
 
 ;;;;
 ;; Core events
@@ -43,7 +43,9 @@
 
 (rf/reg-event-db
   :main/update-videos
-  (fn [db [_ {:keys [folder videos]}]] (assoc db :videos/folder folder :videos/list videos)))
+  (fn [db [_ {:keys [folder videos]}]]
+    (assoc db :videos/folder folder
+              :videos/all (reduce (fn [m v] (assoc m (:filename v) v)) {} videos))))
 
 ;;;;
 ;; User events
@@ -64,6 +66,7 @@
 
 (rf/reg-event-db
   :ui/select-video
+  ;; TODO assoc only video id
   (fn [db [_ video]] (assoc db :videos/current video)))
 
 (rf/reg-event-db
@@ -81,8 +84,12 @@
 (rf/reg-event-db
   :ui/update-current-video-template
   (fn [db [_ id]]
-    (let [current-video (:videos/current db)]
-      (assoc-in db [:videos/current] (assoc current-video :template-id id)))))
+    (let [current-video (:videos/current db)
+          updated-video (assoc current-video :template-id id)
+          fullpath      (:filename updated-video)]
+      (-> db
+        (assoc-in [:videos/current] updated-video)
+        (assoc-in [:videos/all fullpath] updated-video)))))
 
 ;;;;
 ;; templates
@@ -92,19 +99,19 @@
   (fn [db [_ template]]
     (let [id (or (:id template) (random-uuid))]
       (-> db
-        (assoc-in [:templates/list id] template)))))
+        (assoc-in [:templates/all id] template)))))
 
 (rf/reg-event-db
   :ui/edit-template
   (fn [db [_ template]]
     ;; make a copy
-    (assoc db :templates/current (merge {} (get-in db [:templates/list (:id template)])))))
+    (assoc db :templates/current (merge {} (get-in db [:templates/all (:id template)])))))
 
 (rf/reg-event-db
   :ui/update-template
   (fn [db [_ {:keys [id] :as template}]]
     (-> db
-      (assoc-in [:templates/list id] template))))
+      (assoc-in [:templates/all id] template))))
 
 (rf/reg-event-db
   :ui/update-current-template
@@ -117,7 +124,7 @@
   (fn [db [_ template]]
     (let [id (:id template)]
       (-> db
-        (dissoc :templates/list id)))))
+        (dissoc :templates/all id)))))
 
 (rf/reg-event-db
   :ui/deselect-template

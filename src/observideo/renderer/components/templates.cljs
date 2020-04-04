@@ -178,7 +178,7 @@
       [antd/delete-icon] " delete"]]))
 
 (defn- templates-table []
-  (let [templates @(rf/subscribe [:templates/list])]
+  (let [templates @(rf/subscribe [:templates/all])]
     [antd/table {:dataSource (vals templates)
                  :size       "small"
                  :rowKey     "name"

@@ -56,9 +56,9 @@
 
 (defmethod handle :ui/ready [_ sender _]
   (handle :ui/update-videos-folder sender {:folder (db/read :dir/videos)}))
+
 ;;;;
 ;; ipc/ui
-
 
 (defmethod handle :unknown [event sender data]
   (js/console.log "UNKNOWN" event))

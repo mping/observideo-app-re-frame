@@ -11,8 +11,8 @@
 ;; Main
 
 (rf/reg-sub :videos/folder (fn [db _] (:videos/folder db)))
-(rf/reg-sub :videos/list (fn [db _] (:videos/list db)))
+(rf/reg-sub :videos/all (fn [db _] (:videos/all db)))
 (rf/reg-sub :videos/current (fn [db _] (:videos/current db)))
 
-(rf/reg-sub :templates/list (fn [db _] (:templates/list db)))
+(rf/reg-sub :templates/all (fn [db _] (:templates/all db)))
 (rf/reg-sub :templates/current (fn [db _] (:templates/current db)))

@@ -52,7 +52,8 @@
 
 (defn- videos-table []
   (let [folder @(rf/subscribe [:videos/folder])
-        videos @(rf/subscribe [:videos/list])]
+        videos @(rf/subscribe [:videos/all])
+        videos (vals videos)]
     [antd/table {:dataSource videos
                  :rowKey     :filename
                  :size       "small"
@@ -86,10 +87,10 @@
 
 (defn- video-edit []
   (let [video         @(rf/subscribe [:videos/current])
-        templates     @(rf/subscribe [:templates/list])
+        templates     @(rf/subscribe [:templates/all])
         templates     (vals templates)
         filename      (:filename video)
-        selected-tmpl (:template video)]
+        selected-tmpl (:template-id video)]
     [:div
      [antd/row
       ;; left col
