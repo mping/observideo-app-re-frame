@@ -38,7 +38,9 @@
 
 (defn- render-filename [text record] (r/as-element [:span (fname text)]))
 (defn- render-size [text record] (r/as-element [:span text]))
-(defn- render-template [text record] (r/as-element [:span text]))
+(defn- render-template [text record]
+  (let [templates @(rf/subscribe [:templates/all])]
+    (r/as-element [:span (get-in templates [text :name])])))
 (defn- render-duration [text record] (r/as-element [:span (int text) "s"]))
 (defn- render-info [val record]
   (let [info (js->clj val :keywordize-keys true)]
@@ -82,7 +84,7 @@
 ;; main editing
 
 (defn- select-template [video id]
-  (rf/dispatch [:ui/update-current-video-template (uuid id)]))
+  (rf/dispatch [:ui/update-current-video-template (str id)]))
 
 (defn- move-video-time [seconds])
 
@@ -90,32 +92,41 @@
   (let [video             @(rf/subscribe [:videos/current])
         {:keys [duration filename]} video
         templates         (vals @(rf/subscribe [:templates/all]))
+
+        ;; these are "local component state"
+        ;; some can be used to re-trigger a render (r/atom)
+        ;; others are just vars (clojure.core/atom)
         !video-player     (clojure.core/atom nil)
-        video-section     (r/atom 1)]
-
-
+        !step-interval    (clojure.core/atom 1)
+        video-section     (r/atom 0)
+        video-time        (r/atom 0)]
 
     ;; form-2 component
     (fn []
       ;; trigger re-render when some attr on the video changes
       (let [selected-template @(rf/subscribe [:videos/current-template])
-            step-interval     (get selected-template :interval 1)
-            video-steps       (+ (int (/ duration step-interval))
-                                (if (> 0 (mod duration step-interval))
-                                  1
-                                  0))]
+            video-steps   (inc (+ (int (/ duration @!step-interval))
+                                 (if (> 0 (mod duration @!step-interval))
+                                   1
+                                   0)))]
+
+        (reset! !step-interval (get selected-template :interval 1))
+
         [:div
          [antd/row
           ;;;;
           ;; left col - video player
-
           [antd/col {:span 12}
            [antd/page-header {:title  (fname filename) :subTitle filename
                               :onBack #(rf/dispatch [:ui/deselect-video])}]
-           [player/file-player {:url      (str "file://" (:filename video))
-                                :controls true
-                                :width    "100%"
-                                :ref      (fn [el] (reset! !video-player el))}]]
+           [player/file-player {:url        (str "file://" (:filename video))
+                                :controls   true
+                                :width      "100%"
+                                :ref        (fn [el] (reset! !video-player el))
+                                :onProgress (fn [progress]
+                                              (let [secs (.-playedSeconds progress)]
+                                                (reset! video-time secs)
+                                                (reset! video-section (int (/ secs @!step-interval)))))}]]
 
           ;;;;
           ;; right col - template application
@@ -127,18 +138,18 @@
              (for [tmpl templates
                    :let [{:keys [id name]} tmpl]]
                [antd/option {:key id} name])]
-            [:p (str "interval: " step-interval "s")]]
-           [antd/slider {:min            1
+            [:p (str "interval: " @!step-interval "s")]]
+           [antd/slider {:min            0
                          :max            video-steps
                          :value          @video-section
                          :key            "video-section-slider"
                          :tooltipVisible true
                          :dots           true
                          :onChange       #(do (reset! video-section %)
-                                              (.seekTo @!video-player (* (dec %) step-interval) "seconds"))}]]]
+                                              (.seekTo @!video-player (* (dec %) @!step-interval) "seconds"))}]]]
          [:hr]
          [antd/row
-          [:h1 "Here"]]]))))
+          [:h1 "Here:" @video-time "|" @video-section]]]))))
 
 
 (defn- show-video-panel [current]

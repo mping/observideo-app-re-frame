@@ -1,5 +1,6 @@
 (ns observideo.renderer.subs
-  (:require [re-frame.core :as rf :refer [reg-sub subscribe]]))
+  (:require [re-frame.core :as rf :refer [reg-sub subscribe]]
+            [reagent.ratom :as r :refer-macros [reaction]]))
 
 ;;;;
 ;; UI
@@ -22,6 +23,13 @@
 (rf/reg-sub :videos/current
   (fn [db _] (:videos/current db)))
 
+(rf/reg-sub-raw :videos/current-template
+  (fn [db _]
+    (reaction
+      (js/console.log @db)
+      (let [template-id (get-in @db [:videos/current :template-id])]
+        (get-in @db [:templates/all template-id])))))
+#_
 (rf/reg-sub :videos/current-template
   (fn [db _]
     (let [template-id (get-in db [:videos/current :template-id])]

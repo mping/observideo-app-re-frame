@@ -4,7 +4,7 @@
    ;[day8.re-frame.tracing :refer-macros [fn-traced]]
    [observideo.renderer.interceptors :as interceptors]))
 
-(def ^{:private true} demo-id (random-uuid))
+(def ^{:private true} demo-id (str (random-uuid)))
 
 (def demo-template {:id                 demo-id
                     :name               "Demo"
@@ -97,7 +97,7 @@
 (rf/reg-event-db
   :ui/add-template
   (fn [db [_ template]]
-    (let [id (or (:id template) (random-uuid))]
+    (let [id (or (:id template) (str (random-uuid)))]
       (-> db
         (assoc-in [:templates/all id] template)))))
 
