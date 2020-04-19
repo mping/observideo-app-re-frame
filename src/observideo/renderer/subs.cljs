@@ -32,12 +32,20 @@
 (rf/reg-sub-raw :videos/current-section
   (fn [db _]
     (reaction
-      (get-in @db [:videos/current :section]))))
-#_
-(rf/reg-sub :videos/current-template
+      (get-in @db [:videos/current :current-section]))))
+
+(rf/reg-sub-raw :videos/current-observation
   (fn [db _]
-    (let [template-id (get-in db [:videos/current :template-id])]
-      (get-in db [:templates/all template-id]))))
+    (reaction
+      (let [{:keys [index]} (get-in @db [:videos/current :current-section])
+            current-observation (get-in @db [:videos/current :observations index])]
+        (js/console.log (:videos/current @db))
+        current-observation))))
+
+#_(rf/reg-sub :videos/current-template
+    (fn [db _]
+      (let [template-id (get-in db [:videos/current :template-id])]
+        (get-in db [:templates/all template-id]))))
 
 (rf/reg-sub :templates/all
   (fn [db _] (:templates/all db)))

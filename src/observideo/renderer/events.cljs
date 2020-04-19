@@ -6,26 +6,36 @@
 
 (def ^{:private true} demo-id (str (random-uuid)))
 
-(def demo-template {:id                 demo-id
-                    :name               "Demo"
-                    :interval           15
-                    :next-index         3 ;;monotonic counter to ensure old indexes preserve their value
-                    :attributes         {"Peer"   {:index 0 :values ["Alone" "Adults" "Peers" "Adults and Peers" "N/A"]}
-                                         "Gender" {:index 1 :values ["Same" "Opposite" "Both" "N/A"]}
-                                         "Type"   {:index 2 :values ["Roleplay" "Rough and Tumble" "Exercise"]}}})
+(def demo-template {:id         demo-id
+                    :name       "Demo"
+                    :interval   15
+                    :next-index 3                           ;;monotonic counter to ensure old indexes preserve their value
+                    :attributes {"Peer"   {:index 0 :values ["Alone" "Adults" "Peers" "Adults and Peers" "N/A"]}
+                                 "Gender" {:index 1 :values ["Same" "Opposite" "Both" "N/A"]}
+                                 "Type"   {:index 2 :values ["Roleplay" "Rough and Tumble" "Exercise"]}}})
+
+(def demo-video {:filename        "/home/mping/Download … deo_720x480_30mb.mp4"
+                 :duration        183.318
+                 :info            {:a "changeme"}
+                 :md5sum          "changeme"
+                 :size            31551484
+                 :current-section {:time 0, :index 0}
+                 :observations    [{"Peer" nil "Gender" "Same" "Type" "Exercise"}, {}]
+                 :template-id     "7dd2479d-e829-4762-a0ac-de51a68461b5"})
+
 
 (defn empty-db []
   {:ui/tab            :videos
    :ui/timestamp      (str (js/Date.))
 
    ;; videos list is a vec because they are in the filesystem
-   :videos/folder     nil ;;string
-   :videos/all        nil ;;map
-   :videos/current    nil ;;map
+   :videos/folder     nil                                   ;;string
+   :videos/all        nil                                   ;;map
+   :videos/current    nil                                   ;;map
 
    ;; templates are keyed by :id because it facilitates CRUD operations
-   :templates/all     {(:id demo-template) demo-template} ;; {uuid -> map}
-   :templates/current nil}) ;;map
+   :templates/all     {(:id demo-template) demo-template}   ;; {uuid -> map}
+   :templates/current nil})                                 ;;map
 
 ;;;;
 ;; Core events
@@ -81,12 +91,29 @@
 ;;;;
 ;; video editing
 
+(defn- count-observations [duration step-interval]
+  (+ (int (/ duration step-interval))
+    (if (> (mod duration step-interval) 0) 1 0)))
+
+(defn- make-empty-observations [template n]
+  (->> (range)
+    (take n)
+    (map (fn [_]
+           (let [attrs (:attributes template)]
+             ;; create a mapping {"name" => nil}
+             (reduce-kv (fn [m k _] (assoc m k nil)) {} attrs))))
+    (vec)))
+
 (rf/reg-event-db
   :ui/update-current-video-template
   (fn [db [_ id]]
-    (let [current-video (:videos/current db)
-          updated-video (assoc current-video :template-id id)
-          fullpath      (:filename updated-video)]
+    (let [current-video      (:videos/current db)
+          template           (get-in db [:templates/all id])
+          template-interval  (:interval template)
+          total-observations (count-observations (:duration current-video) template-interval)
+          new-observations   (make-empty-observations template total-observations)
+          updated-video      (assoc current-video :template-id id :observations new-observations)
+          fullpath           (:filename updated-video)]
       (-> db
         (assoc-in [:videos/current] updated-video)
         (assoc-in [:videos/all fullpath] updated-video)))))
@@ -95,8 +122,19 @@
   :ui/update-current-video-section
   (fn [db [_ time index]]
     (let [current-video (:videos/current db)
-          updated-video (assoc current-video :section {:time time :index index})
+          updated-video (assoc current-video :current-section {:time time :index index})
           fullpath      (:filename updated-video)]
+      (-> db
+        (assoc-in [:videos/current] updated-video)
+        (assoc-in [:videos/all fullpath] updated-video)))))
+
+(rf/reg-event-db
+  :ui/update-current-video-current-section-observation
+  (fn [db [_ observation]]
+    (let [current-video     (:videos/current db)
+          observation-index (get-in current-video [:current-section :index])
+          updated-video     (assoc-in current-video [:observations observation-index] observation)
+          fullpath          (:filename updated-video)]
       (-> db
         (assoc-in [:videos/current] updated-video)
         (assoc-in [:videos/all fullpath] updated-video)))))
@@ -106,10 +144,11 @@
 
 (rf/reg-event-db
   :ui/add-template
-  (fn [db [_ template]]
-    (let [id (or (:id template) (str (random-uuid)))]
+  (fn [db [_ _]]
+    (let [new-template (dissoc demo-template :id)
+          id           (str (random-uuid))]
       (-> db
-        (assoc-in [:templates/all id] template)))))
+        (assoc-in [:templates/all id] (assoc new-template :id id))))))
 
 (rf/reg-event-db
   :ui/edit-template

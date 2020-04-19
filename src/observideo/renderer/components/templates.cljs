@@ -179,15 +179,20 @@
 
 (defn- templates-table []
   (let [templates @(rf/subscribe [:templates/all])]
-    [antd/table {:dataSource (vals templates)
-                 :size       "small"
-                 :rowKey     "name"
-                 :bordered   true
-                 :pagination {:position "top"}
-                 :title      (constantly "Templates")}
-     [antd/column {:title "Name" :dataIndex :name}]
-     [antd/column {:title "Attributes" :render render-attributes}]
-     [antd/column {:title "Actions" :render render-actions}]]))
+    [:div
+     [antd/table {:dataSource (vals templates)
+                  :size       "small"
+                  :rowKey     "name"
+                  :bordered   true
+                  :pagination {:position "top"}
+                  :title      (constantly "Templates")}
+      [antd/column {:title "Name" :dataIndex :name}]
+      [antd/column {:title "Attributes" :render render-attributes}]
+      [antd/column {:title "Actions" :render render-actions}]]
+
+     [antd/button {:type    "primary" :size "small"
+                   :onClick #(rf/dispatch [:ui/add-template nil])}
+      [antd/plus-icon] " add template"]]))
 
 
 (defn show-template-panel [current]

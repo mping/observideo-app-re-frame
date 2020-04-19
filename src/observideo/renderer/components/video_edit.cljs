@@ -22,6 +22,7 @@
 
 (defn- template-form []
   (let [template     @(rf/subscribe [:videos/current-template])
+        observation  @(rf/subscribe [:videos/current-observation])
         attributes   (:attributes template)
         sorted-attrs (sort-by (fn [[_ v]] (:index v)) attributes)]
     [:div.ant-table.ant-table-middle
@@ -41,17 +42,24 @@
           ;; attrs list per header
           (for [[header v] sorted-attrs
                 :let [vals  (:values v)
-                      pairs (sort-by last (zipmap vals (range)))]]
-            [:td {:style {:padding 0}
-                  :key (str "attr" (:index v))
-                  :valign "top"}
+                      pairs (sort-by last (zipmap vals (range)))
+                      tdkey (str "attr" (:index v))]]
+            [:td {:style {:padding 0} :key tdkey :valign "top"}
              [:table nil
               [:tbody nil
                ;; build an indexed [val, index]
                (for [pair pairs
-                     :let [[val i] pair]]
-                 [:tr {:key (str "row-" i)}
-                  [:td {:key (str "cell-" i)} val]])]]])]]]]]]))
+                     :let [[attribute i] pair
+                           attribute-on? (= attribute (get observation header))
+                           rowkey        (str "row-" i)
+                           tdkey         (str "cell-" i)]]
+
+                 [:tr {:key rowkey}
+                  [:td {:key     tdkey
+                        :style {:background (when attribute-on? "red")}
+                        :onClick #(rf/dispatch [:ui/update-current-video-current-section-observation
+                                                (assoc observation header attribute)])}
+                   attribute]])]]])]]]]]]))
 
 (defn root []
   (let [video          @(rf/subscribe [:videos/current])
@@ -71,10 +79,9 @@
       ;; trigger re-render when some attr on the video changes
       (let [section           @(rf/subscribe [:videos/current-section])
             selected-template @(rf/subscribe [:videos/current-template])
-            video-steps       (inc (+ (int (/ duration @!step-interval))
-                                     (if (> 0 (mod duration @!step-interval))
-                                       1
-                                       0)))]
+            observation       @(rf/subscribe [:videos/current-observation])
+            num-observations  (+ (int (/ duration @!step-interval))
+                                (if (> (mod duration @!step-interval) 0) 1 0))]
 
         (reset! !step-interval (get selected-template :interval 1))
 
@@ -110,7 +117,7 @@
                [antd/option {:key id} name])]
             [:span (str "interval: " @!step-interval "s")]]
            [antd/slider {:min            0
-                         :max            video-steps
+                         :max            num-observations
                          :value          @video-section
                          :key            "video-section-slider"
                          :tooltipVisible true
