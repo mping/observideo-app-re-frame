@@ -20,11 +20,11 @@
 
    ;; videos list is a vec because they are in the filesystem
    :videos/folder     nil ;;string
-   :videos/all       nil ;;map
+   :videos/all        nil ;;map
    :videos/current    nil ;;map
 
    ;; templates are keyed by :id because it facilitates CRUD operations
-   :templates/all    {(:id demo-template) demo-template} ;; {uuid -> map}
+   :templates/all     {(:id demo-template) demo-template} ;; {uuid -> map}
    :templates/current nil}) ;;map
 
 ;;;;
@@ -86,6 +86,16 @@
   (fn [db [_ id]]
     (let [current-video (:videos/current db)
           updated-video (assoc current-video :template-id id)
+          fullpath      (:filename updated-video)]
+      (-> db
+        (assoc-in [:videos/current] updated-video)
+        (assoc-in [:videos/all fullpath] updated-video)))))
+
+(rf/reg-event-db
+  :ui/update-current-video-section
+  (fn [db [_ time index]]
+    (let [current-video (:videos/current db)
+          updated-video (assoc current-video :section {:time time :index index})
           fullpath      (:filename updated-video)]
       (-> db
         (assoc-in [:videos/current] updated-video)

@@ -27,7 +27,6 @@
   (.on ipcRenderer "event" ipc/handle-message))
 
 (defn ^:dev/after-load start []
-  (js/console.log "after load")
   (reagent/render [observideo.renderer.views/ui] dom-root))
 
 (init)

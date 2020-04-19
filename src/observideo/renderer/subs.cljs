@@ -26,9 +26,13 @@
 (rf/reg-sub-raw :videos/current-template
   (fn [db _]
     (reaction
-      (js/console.log @db)
       (let [template-id (get-in @db [:videos/current :template-id])]
         (get-in @db [:templates/all template-id])))))
+
+(rf/reg-sub-raw :videos/current-section
+  (fn [db _]
+    (reaction
+      (get-in @db [:videos/current :section]))))
 #_
 (rf/reg-sub :videos/current-template
   (fn [db _]

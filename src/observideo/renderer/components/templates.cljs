@@ -121,7 +121,7 @@
               [antd/plus-circle-icon]]]])]]
 
        [:tbody nil
-        [:tr nil [:td {:colspan 0}]]
+        [:tr nil [:td {:colSpan 0}]]
         [:tr nil
          ;; attrs list per header
          (for [[header v] sorted-attrs
