@@ -69,7 +69,7 @@
     "react-dom": "^16.13.0",
     "react-flip-move": "^3.0.4",
     "react-highlight.js": "^1.0.7",
-    "react-player": "^1.15.2",
-    "regenerator-runtime": "^0.13.5"
+    "regenerator-runtime": "^0.13.5",
+    "video-react": "^0.14.1"
   }
 }

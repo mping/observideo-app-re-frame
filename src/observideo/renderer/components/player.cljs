@@ -1,6 +1,5 @@
 (ns observideo.renderer.components.player
   (:require [reagent.core :as reagent]
-            ["react-player" :as ReactPlayer :refer [default]]))
+            ["video-react" :as VideoPlayer]))
 
-(def file-player (reagent/adapt-react-class default))
-
+(def video-player (reagent/adapt-react-class (.-Player VideoPlayer)))
