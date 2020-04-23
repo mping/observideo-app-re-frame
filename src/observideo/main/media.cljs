@@ -9,8 +9,6 @@
    ["url" :as url]
    ["md5-file" :as md5]))
 
-
-
 ;;;;
 ;; general media functions
 

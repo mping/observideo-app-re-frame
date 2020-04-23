@@ -3,12 +3,7 @@
             [re-frame.core :as rf]
             [goog.object :as gobj]
             [taoensso.timbre :as log]
-            [cognitect.transit :as t]))
-
-(def reader (t/reader :json))
-(def writer (t/writer :json))
-(defn- serialize [cljdata] (t/write writer cljdata))
-(defn- deserialize [s] (t/read reader s))
+            [observideo.common.serde :as serde]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; IPC Main <> Renderer
@@ -22,8 +17,8 @@
 ;; post messages from renderer to main
 (defn send-message [event data]
   (log/infof "[rend]-> [%s] %s" event data)
-  ;(.send ipcRenderer "event" (serialize {:event (subs (str event) 1) :data data})))
-  (.send ipcRenderer "event" (clj->js {:event (subs (str event) 1) :data data})))
+  (.send ipcRenderer "event" (serde/serialize {:event (subs (str event) 1) :data data})))
+  ;(.send ipcRenderer "event" (clj->js {:event (subs (str event) 1) :data data})))
 
 ;; called when the renderer received an ipc message
 (defmulti handle (fn [event _ _] event) :default :unknown)
@@ -42,8 +37,8 @@
 ;; main handler
 (defn handle-message [evt jsdata]
   (let [sender      (.-sender evt)
-        ;datum (deserialize jsdata)
-        datum (js->clj jsdata :keywordize-keys true)
+        datum (serde/deserialize jsdata)
+        ;datum (js->clj jsdata :keywordize-keys true)
         {:keys [event data]} datum]
     (log/infof "[rend]<- [%s] %s" event data)
     (handle (keyword event) sender data)))

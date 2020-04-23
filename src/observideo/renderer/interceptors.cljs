@@ -20,5 +20,4 @@
     :after (fn [{:keys [effects] :as context}]
              (let [db (:db effects)]
                (ipcrenderer/send-message :db/update db)
-               (js/console.log "QUEUE save" db)
                context))))

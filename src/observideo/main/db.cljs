@@ -20,25 +20,32 @@
 (def db-file (str (.getPath app "userData") "/observideo.db.transit"))
 (def db (atom nil))
 
-(defn read-db []
+;; add/remove envelope
+;; may be helpful in the future to facilitate data migrations
+(defn- wrap [datum] {:version 1 :data datum})
+(defn- unwrap [wrapped] (get wrapped :data))
+
+(defn- read-db []
   (log/infof "Reading entire db at %s" db-file)
   (if (fs/existsSync db-file)
-    (let [reader   (t/reader :json-verbose)
+    (let [reader    (t/reader :json-verbose)
           ;; lame, should be async
-          data     (fs/readFileSync db-file)
-          clj-data (t/read reader data)]
-      (reset! db clj-data))
+          data      (fs/readFileSync db-file)
+          clj-data  (t/read reader data)
+          unwrapped (unwrap clj-data)]
+      (reset! db unwrapped))
     ;else
     (log/warnf "File does not exist: %s" db-file)))
 
+(defn overwrite [data]
+  (log/infof "Updating entire db at %s" db-file)
+  (let [writer (t/writer :json-verbose)
+        wrapped (wrap data)]
+    ;; lame, should be async
+    (fs/writeFileSync db-file (t/write writer wrapped))))
+
 (defn read [k]
   (get @db k))
-
-(defn update-all [data]
-  (log/infof "Updating entire db at %s" db-file)
-  (let [writer (t/writer :json-verbose)]
-    ;; lame, should be async
-    (fs/writeFileSync db-file (t/write writer data))))
 
 (defn init []
   (log/infof "Initializing")
