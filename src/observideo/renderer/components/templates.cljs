@@ -90,11 +90,12 @@
        [antd/input {:value    tmpl-name
                     :onChange #(update-template-name template (-> % .-target .-value))}]]
 
-      [antd/form-item {:label "Interval (secs)" #_#_:rules [{:required true :message "Field is required"}]}
+      [antd/form-item {:label (str"Interval (secs): " intv)}
        [antd/slider {:min 1
                      :max 60
                      :value intv
                      :key "slider"
+                     :tooltipVisible false
                      :onChange #(update-template-interval template %)}]]
 
       ;; dynamic fields

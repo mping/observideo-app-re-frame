@@ -48,6 +48,15 @@
   :db/load
   (fn [db server-db] (merge db server-db)))
 
+(rf/reg-event-db
+  :db/reset
+  (fn [db [_ server-db]]
+    (js/console.log "merging::")
+    (js/console.log db)
+    (js/console.log server-db)
+    db
+    #_(merge db server-db)))
+
 ;;;;
 ;; IPC events
 
@@ -62,7 +71,7 @@
 
 (rf/reg-event-db
   :ui/ready
-  [interceptors/ipc2main-interceptor]
+  [interceptors/event->ipc]
   (fn [db _] db))
 
 ;;;;
@@ -70,7 +79,7 @@
 
 (rf/reg-event-db
   :ui/update-videos-folder
-  [interceptors/ipc2main-interceptor]
+  [interceptors/event->ipc interceptors/queue-save-db]
   (fn [db [_ folder]]
     (assoc db :videos/folder folder)))
 
@@ -106,6 +115,7 @@
 
 (rf/reg-event-db
   :ui/update-current-video-template
+  [interceptors/queue-save-db]
   (fn [db [_ id]]
     (let [current-video      (:videos/current db)
           template           (get-in db [:templates/all id])
@@ -130,6 +140,7 @@
 
 (rf/reg-event-db
   :ui/update-current-video-current-section-observation
+  [interceptors/queue-save-db]
   (fn [db [_ observation]]
     (let [current-video     (:videos/current db)
           observation-index (get-in current-video [:current-section :index])
@@ -144,6 +155,7 @@
 
 (rf/reg-event-db
   :ui/add-template
+  [interceptors/queue-save-db]
   (fn [db [_ _]]
     (let [new-template (dissoc demo-template :id)
           id           (str (random-uuid))]
@@ -158,18 +170,21 @@
 
 (rf/reg-event-db
   :ui/update-template
+  [interceptors/queue-save-db]
   (fn [db [_ {:keys [id] :as template}]]
     (-> db
       (assoc-in [:templates/all id] template))))
 
 (rf/reg-event-db
   :ui/update-current-template
+  [interceptors/queue-save-db]
   (fn [db [_ template]]
     (-> db
       (assoc-in [:templates/current] template))))
 
 (rf/reg-event-db
   :ui/delete-template
+  [interceptors/queue-save-db]
   (fn [db [_ template]]
     (let [id (:id template)]
       (-> db

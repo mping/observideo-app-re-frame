@@ -6,7 +6,8 @@
    ["fluent-ffmpeg" :as ffmpeg-command]
    ["electron" :as electron :refer [ipcMain]]
    ["path" :as path]
-   ["url" :as url]))
+   ["url" :as url]
+   ["md5-file" :as md5]))
 
 
 
@@ -20,8 +21,8 @@
 (.setFfprobePath ffmpeg-command (.-path ffprobe-static-electron))
 (.setFfmpegPath ffmpeg-command (.-path ffmpeg-static-electron))
 
-(defn checksum [video]
-  (assoc video "md5sum" "changeme"))
+(defn checksum [{:strs [filename] :as video}]
+  (assoc video "md5sum" (.sync md5 filename)))
 
 (defn db-info [video]
   ;; TODO enhance with db info

@@ -3,7 +3,7 @@
             ["regenerator-runtime/runtime"]
             ["antd" :refer [Layout Menu Breadcrumb Icon Button PageHeader Table Breadcrumb
                             Row Col
-                            Form Select Input Slider Icon]]
+                            Form Select Input Slider Icon Affix]]
             ["@ant-design/icons" :refer [VideoCameraOutlined TagsOutlined BarChartOutlined
                                          UploadOutlined EditOutlined DeleteOutlined SaveOutlined
                                          PlusCircleOutlined MinusCircleOutlined MinusOutlined PlusOutlined]]))
@@ -52,6 +52,7 @@
 (def menuitem (reagent/adapt-react-class (.-Item Menu)))
 
 (def page-header (reagent/adapt-react-class PageHeader))
+(def affix (reagent/adapt-react-class Affix))
 
 (def button (reagent/adapt-react-class Button))
 (def table (reagent/adapt-react-class Table))

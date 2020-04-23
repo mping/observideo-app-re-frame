@@ -3,9 +3,15 @@
    [observideo.main.media :as media]
    [observideo.main.db :as db]
    [taoensso.timbre :as log]
+   [cognitect.transit :as t]
    ["electron" :as electron :refer [BrowserWindow remote app ipcRender ipcMain]]
    ["path" :as path]
    ["url" :as url]))
+
+(def reader (t/reader :json))
+(def writer (t/writer :json))
+(defn- serialize [cljdata] (t/write writer cljdata))
+(defn- deserialize [s] (t/read reader s))
 
 ;;;;
 ;; utils
@@ -38,7 +44,8 @@
   ([event data]
    (send-message (web-contents (current-window-id)) event data))
   ([webcontents event data]
-   (log/infof "[main]-> [%s] %s" event data)
+   (log/infof "Sent event [%s] %s" event data)
+   ;(.send webcontents "event" (serialize {:event (subs (str event) 1) :data data}))
    (.send webcontents "event" (clj->js {:event (subs (str event) 1) :data data}))))
 
 ;; called when the renderer received an ipc message
@@ -55,7 +62,13 @@
 
 
 (defmethod handle :ui/ready [_ sender _]
-  (handle :ui/update-videos-folder sender {:folder (db/read :dir/videos)}))
+  (let [videos-folder (db/read :dir/videos)]
+    ;; TODO send all data upstream
+    #_(send-message sender :main/reset-db @db/db)
+    (handle :ui/update-videos-folder sender {:folder videos-folder})))
+
+(defmethod handle :db/update [event sender data]
+  (db/update-all data))
 
 ;;;;
 ;; ipc/ui
@@ -67,7 +80,8 @@
 ;; main handler
 (defn handle-message [evt jsdata]
   (let [sender (.-sender evt)
+        ;datum  (deserialize jsdata)
         datum  (js->clj jsdata :keywordize-keys true)
         {:keys [event data]} datum]
-    (log/infof "[rend]<- [%s] %s" (keyword event) data)
+    (log/infof "Received event [%s] %s" (keyword event) data)
     (handle (keyword event) sender data)))

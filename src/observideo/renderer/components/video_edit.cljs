@@ -115,17 +115,21 @@
              (for [tmpl templates
                    :let [{:keys [id name]} tmpl]]
                [antd/option {:key id} name])]
-            [:span (str "interval: " @!step-interval "s")]]
+            [:span (str " interval: " @!step-interval "s")]]
            [antd/slider {:min            0
                          :max            num-observations
                          :value          @video-section
                          :key            "video-section-slider"
-                         :tooltipVisible true
+                         :tooltipVisible false
                          :dots           true
                          :onChange       #(do (reset! video-section %)
                                               (.seek @!video-player (* % @!step-interval) "seconds")
                                               (.pause @!video-player))}]
-           [template-form]]]
+
+           ;; for videos in portrait mode, template-form may get out of viewport
+           ;; affix sticks it on top
+           [antd/affix {}
+            [template-form]]]]
          [:hr]
          [antd/row
           [:h1 "Here:" (:time section) "|" (:index section)]]]))))
