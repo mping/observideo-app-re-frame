@@ -91,8 +91,8 @@
   (db/init))
 
 (defn init []
-  ; (init-menu)
-  (.setApplicationMenu menu nil)
+  (init-menu)
+  (if-not is-development? (.setApplicationMenu menu nil))
   (init-db)
   (init-browser-window))
 

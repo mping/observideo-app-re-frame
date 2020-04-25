@@ -1,8 +1,7 @@
 (ns observideo.common.serde
   (:require
    [taoensso.timbre :as log]
-   [cognitect.transit :as t]
-   [clojure.walk :as walk]))
+   [cognitect.transit :as t]))
 
 (def reader (t/reader :json))
 (def writer (t/writer :json))

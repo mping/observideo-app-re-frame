@@ -67,7 +67,7 @@
   (rf/dispatch [:ui/deselect-template]))
 
 ;;;;
-;;
+;; Main template form
 
 (defn- template-form []
   (let [template     @(rf/subscribe [:templates/current])
@@ -164,6 +164,13 @@
                     :onClick #(cancel)}
        "Cancel"]]]))
 
+;;;;
+;; Template list cell renderers
+
+(defn- render-name [text record]
+  (r/as-element [:a {:href "#" :onClick #(rf/dispatch [:ui/edit-template (js->clj record :keywordize-keys true)])}
+                 text]))
+
 (defn- render-attributes [_ record]
   (let [clj-record (js->clj record :keywordize-keys true)]
     (str/join ", " (map name (keys (:attributes clj-record))))))
@@ -187,7 +194,7 @@
                   :bordered   true
                   :pagination {:position "top"}
                   :title      (constantly "Templates")}
-      [antd/column {:title "Name" :dataIndex :name}]
+      [antd/column {:title "Name" :dataIndex :name :render render-name}]
       [antd/column {:title "Attributes" :render render-attributes}]
       [antd/column {:title "Actions" :render render-actions}]]
 

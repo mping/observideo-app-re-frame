@@ -37,12 +37,17 @@
 ;;;;
 ;;main listing
 
-(defn- render-filename [text record] (r/as-element [:span (fname text)]))
-(defn- render-size [text record] (r/as-element [:span text]))
+(defn- render-filename [text record]
+  (r/as-element [:a {:href "#"
+                     :onClick #(rf/dispatch [:ui/select-video (js->clj record :keywordize-keys true)])}
+                 (fname text)]))
+(defn- render-size [text record]
+  (r/as-element [:span text]))
 (defn- render-template [text record]
   (let [templates @(rf/subscribe [:templates/all])]
     (r/as-element [:span (get-in templates [text :name])])))
-(defn- render-duration [text record] (r/as-element [:span (int text) "s"]))
+(defn- render-duration [text record]
+  (r/as-element [:span (int text) "s"]))
 (defn- render-info [val record]
   (let [info (js->clj val :keywordize-keys true)]
     (r/as-element [:span (:a info)])))

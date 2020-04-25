@@ -22,8 +22,12 @@
 
 ;; add/remove envelope
 ;; may be helpful in the future to facilitate data migrations
-(defn- wrap [datum] {:version 1 :data datum})
-(defn- unwrap [wrapped] (get wrapped :data))
+(defn- wrap [datum]
+  {:version 1
+   :data (assoc datum :observideo/filename db-file)})
+
+(defn- unwrap [wrapped]
+  (get wrapped :data))
 
 (defn- read-db []
   (log/infof "Reading entire db at %s" db-file)

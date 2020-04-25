@@ -8,9 +8,6 @@
 (rf/reg-sub :ui/active-tab
   (fn [db _] (:ui/tab db)))
 
-(rf/reg-sub :ui/timestamp
-  (fn [db _] (:ui/timestamp db)))
-
 ;;;;
 ;; Main
 

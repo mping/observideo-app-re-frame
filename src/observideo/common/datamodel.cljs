@@ -19,14 +19,14 @@
 
 
 (defn empty-db []
-  {:ui/tab            :videos
-   :ui/timestamp      (str (js/Date.))
+  {:observideo/filename nil
+   :ui/tab              :videos
 
    ;; videos list is a vec because they are in the filesystem
-   :videos/folder     nil                                   ;;string
-   :videos/all        nil                                   ;;map
-   :videos/current    nil                                   ;;map
+   :videos/folder       nil                                 ;;string
+   :videos/all          nil                                 ;;map {filename > video}
+   :videos/current      nil                                 ;;video
 
    ;; templates are keyed by :id because it facilitates CRUD operations
-   :templates/all     {(:id demo-template) demo-template}   ;; {uuid -> map}
-   :templates/current nil})                                 ;;map
+   :templates/all       {(:id demo-template) demo-template} ;; {uuid -> template}
+   :templates/current   nil})                               ;; template

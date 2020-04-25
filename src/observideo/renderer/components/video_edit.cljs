@@ -20,7 +20,8 @@
 (defn- select-template [video id]
   (rf/dispatch [:ui/update-current-video-template (str id)]))
 
-(defn- template-form []
+
+(defn- observation-table []
   (let [template     @(rf/subscribe [:videos/current-template])
         observation  @(rf/subscribe [:videos/current-observation])
         attributes   (:attributes template)
@@ -52,7 +53,8 @@
                      :let [[attribute i] pair
                            attribute-on? (= attribute (get observation header))
                            rowkey        (str "row-" i)
-                           tdkey         (str "cell-" i)]]
+                           tdkey         (str "cell-" i)
+                           _ (js/console.log header  "_>" attribute">>" observation attribute-on?)]]
 
                  [:tr {:key rowkey}
                   [:td {:key     tdkey
@@ -79,7 +81,6 @@
       ;; trigger re-render when some attr on the video changes
       (let [section           @(rf/subscribe [:videos/current-section])
             selected-template @(rf/subscribe [:videos/current-template])
-            observation       @(rf/subscribe [:videos/current-observation])
             num-observations  (+ (int (/ duration @!step-interval))
                                 (if (> (mod duration @!step-interval) 0) 1 0))]
 
@@ -126,10 +127,10 @@
                                               (.seek @!video-player (* % @!step-interval) "seconds")
                                               (.pause @!video-player))}]
 
-           ;; for videos in portrait mode, template-form may get out of viewport
+           ;; for videos in portrait mode, observation-table may get out of viewport
            ;; affix sticks it on top
            [antd/affix {}
-            [template-form]]]]
+            [observation-table]]]]
          [:hr]
          [antd/row
           [:h1 "Here:" (:time section) "|" (:index section)]]]))))

@@ -16,9 +16,8 @@
 
 ;; post messages from renderer to main
 (defn send-message [event data]
-  (log/infof "[rend]-> [%s] %s" event data)
+  (log/debugf ">>[%s] %s" event data)
   (.send ipcRenderer "event" (serde/serialize {:event (subs (str event) 1) :data data})))
-  ;(.send ipcRenderer "event" (clj->js {:event (subs (str event) 1) :data data})))
 
 ;; called when the renderer received an ipc message
 (defmulti handle (fn [event _ _] event) :default :unknown)
@@ -32,13 +31,12 @@
   (rf/dispatch [:db/reset data]))
 
 (defmethod handle :unknown [event sender data]
-  (js/console.log "UNKNOWN" event sender data))
+  (log/warnf "UNKNOWN EVENT %s" data))
 
 ;; main handler
 (defn handle-message [evt jsdata]
   (let [sender      (.-sender evt)
         datum (serde/deserialize jsdata)
-        ;datum (js->clj jsdata :keywordize-keys true)
         {:keys [event data]} datum]
-    (log/infof "[rend]<- [%s] %s" event data)
+    (log/debugf "<<[%s] %s" event data)
     (handle (keyword event) sender data)))

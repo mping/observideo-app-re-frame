@@ -53,8 +53,9 @@
 
 (rf/reg-event-db
   :ui/select-video
-  ;; TODO assoc only video id
-  (fn [db [_ video]] (assoc db :videos/current video)))
+  (fn [db [_ video]]
+    (let [db-video (get-in db [:videos/all (:filename video)])]
+      (assoc db :videos/current db-video))))
 
 (rf/reg-event-db
   :ui/deselect-video
@@ -78,7 +79,7 @@
     (map (fn [_]
            (let [attrs (:attributes template)]
              ;; create a mapping {"name" => nil}
-             (reduce-kv (fn [m k _] (assoc m k nil)) {} attrs))))
+             (reduce-kv (fn [m k _] (assoc m (str k) nil)) {} attrs))))
     (vec)))
 
 (rf/reg-event-db
@@ -92,6 +93,7 @@
           new-observations   (make-empty-observations template total-observations)
           updated-video      (assoc current-video :template-id id :observations new-observations)
           fullpath           (:filename updated-video)]
+      (js/console.log "updating" :videos/all fullpath updated-video)
       (-> db
         (assoc-in [:videos/current] updated-video)
         (assoc-in [:videos/all fullpath] updated-video)))))
@@ -114,6 +116,7 @@
           observation-index (get-in current-video [:current-section :index])
           updated-video     (assoc-in current-video [:observations observation-index] observation)
           fullpath          (:filename updated-video)]
+      (js/console.log "updating" :videos/all fullpath updated-video)
       (-> db
         (assoc-in [:videos/current] updated-video)
         (assoc-in [:videos/all fullpath] updated-video)))))
