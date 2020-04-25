@@ -39,7 +39,7 @@
   ([event data]
    (send-message (web-contents (current-window-id)) event data))
   ([webcontents event data]
-   (log/infof "Sent event [%s] %s" event data)
+   (log/debugf "Sent event [%s] %s" event data)
    (.send webcontents "event" (serde/serialize {:event (subs (str event) 1) :data data}))))
    ;(.send webcontents "event" (clj->js {:event (subs (str event) 1) :data data}))))
 
@@ -58,6 +58,7 @@
 
 (defmethod handle :ui/ready [_ sender _]
   (let [videos-folder (db/read :dir/videos)]
+    (log/debugf "RESETTING %s" @db/db)
     (send-message sender :main/reset-db @db/db)
     (handle :ui/update-videos-folder sender {:folder videos-folder})))
 
@@ -68,7 +69,7 @@
 ;; ipc/ui
 
 (defmethod handle :unknown [event sender data]
-  (js/console.log "UNKNOWN" event))
+  (log/warn "UNKNOWN EVENT %s" event))
 
 ;;;;
 ;; main handler
@@ -77,5 +78,5 @@
         datum  (serde/deserialize jsdata)
         ;datum  (js->clj jsdata :keywordize-keys true)
         {:keys [event data]} datum]
-    (log/infof "Received event [%s] %s" (keyword event) data)
+    (log/debugf "Received event [%s] %s" (keyword event) data)
     (handle (keyword event) sender data)))

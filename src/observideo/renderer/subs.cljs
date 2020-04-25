@@ -39,7 +39,6 @@
     (reaction
       (let [{:keys [index]} (get-in @db [:videos/current :current-section])
             current-observation (get-in @db [:videos/current :observations index])]
-        (js/console.log (:videos/current @db))
         current-observation))))
 
 #_(rf/reg-sub :videos/current-template

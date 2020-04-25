@@ -7,5 +7,16 @@
 (def reader (t/reader :json))
 (def writer (t/writer :json))
 
-(defn- serialize [cljdata] (t/write writer (walk/keywordize-keys cljdata)))
-(defn- deserialize [s] (t/read reader s))
+(defn- serialize [cljdata]
+  (let [start  (.getTime (js/Date.))
+        result (t/write writer cljdata)
+        end    (.getTime (js/Date.))]
+    (log/debug "Serialized in" (- end start) "ms")
+    result))
+
+(defn- deserialize [s]
+  (let [start  (.getTime (js/Date.))
+        result (t/read reader s)
+        end    (.getTime (js/Date.))]
+    (log/debug "Deserialized in" (- end start) "ms")
+    result))

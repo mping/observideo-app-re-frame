@@ -1,6 +1,7 @@
 (ns observideo.main.media
   (:require 
    [clojure.string :as s]
+   [clojure.walk :as walk]
    [taoensso.timbre :as log]
    ["fast-glob" :as fast-glob]
    ["fluent-ffmpeg" :as ffmpeg-command]
@@ -28,7 +29,8 @@
 
 (defn filter-keys [video]
   (-> video
-    (select-keys ["filename" "size" "duration" "info" "md5sum"])))
+    (select-keys ["filename" "size" "duration" "info" "md5sum"])
+    (walk/keywordize-keys)))
 
 (defn read-metadata [path]
   (js/Promise. 

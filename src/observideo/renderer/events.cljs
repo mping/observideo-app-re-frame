@@ -2,47 +2,17 @@
   (:require
    [re-frame.core :as rf]
    ;[day8.re-frame.tracing :refer-macros [fn-traced]]
+   [observideo.common.datamodel :as datamodel]
    [observideo.renderer.interceptors :as interceptors]))
 
-(def ^{:private true} demo-id (str (random-uuid)))
-
-(def demo-template {:id         demo-id
-                    :name       "Demo"
-                    :interval   15
-                    :next-index 3                           ;;monotonic counter to ensure old indexes preserve their value
-                    :attributes {"Peer"   {:index 0 :values ["Alone" "Adults" "Peers" "Adults and Peers" "N/A"]}
-                                 "Gender" {:index 1 :values ["Same" "Opposite" "Both" "N/A"]}
-                                 "Type"   {:index 2 :values ["Roleplay" "Rough and Tumble" "Exercise"]}}})
-
-(def demo-video {:filename        "/home/mping/Download … deo_720x480_30mb.mp4"
-                 :duration        183.318
-                 :info            {:a "changeme"}
-                 :md5sum          "changeme"
-                 :size            31551484
-                 :current-section {:time 0, :index 0}
-                 :observations    [{"Peer" nil "Gender" "Same" "Type" "Exercise"}, {}]
-                 :template-id     "7dd2479d-e829-4762-a0ac-de51a68461b5"})
-
-
-(defn empty-db []
-  {:ui/tab            :videos
-   :ui/timestamp      (str (js/Date.))
-
-   ;; videos list is a vec because they are in the filesystem
-   :videos/folder     nil                                   ;;string
-   :videos/all        nil                                   ;;map
-   :videos/current    nil                                   ;;map
-
-   ;; templates are keyed by :id because it facilitates CRUD operations
-   :templates/all     {(:id demo-template) demo-template}   ;; {uuid -> map}
-   :templates/current nil})                                 ;;map
+(def demo-template datamodel/demo-template)
 
 ;;;;
 ;; Core events
 
 (rf/reg-event-db
   :db/initialize
-  (fn [_ _] (empty-db)))
+  (fn [_ _] (datamodel/empty-db)))
 
 (rf/reg-event-db
   :db/load
@@ -51,17 +21,15 @@
 (rf/reg-event-db
   :db/reset
   (fn [db [_ server-db]]
-    (js/console.log "merging::")
-    (js/console.log db)
-    (js/console.log server-db)
-    db
-    #_(merge db server-db)))
+    (or server-db db)))
+    ;(merge db server-db)))
 
 ;;;;
 ;; IPC events
 
 (rf/reg-event-db
   :main/update-videos
+  [interceptors/queue-save-db]
   (fn [db [_ {:keys [folder videos]}]]
     (assoc db :videos/folder folder
               :videos/all (reduce (fn [m v] (assoc m (:filename v) v)) {} videos))))
@@ -81,7 +49,7 @@
   :ui/update-videos-folder
   [interceptors/event->ipc interceptors/queue-save-db]
   (fn [db [_ folder]]
-    (assoc db :videos/folder folder)))
+    (assoc db :videos/folder (:folder folder))))
 
 (rf/reg-event-db
   :ui/select-video
