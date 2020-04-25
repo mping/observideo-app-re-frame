@@ -53,8 +53,7 @@
                      :let [[attribute i] pair
                            attribute-on? (= attribute (get observation header))
                            rowkey        (str "row-" i)
-                           tdkey         (str "cell-" i)
-                           _ (js/console.log header  "_>" attribute">>" observation attribute-on?)]]
+                           tdkey         (str "cell-" i)]]
 
                  [:tr {:key rowkey}
                   [:td {:key     tdkey

@@ -38,10 +38,13 @@
             current-observation (get-in @db [:videos/current :observations index])]
         current-observation))))
 
-#_(rf/reg-sub :videos/current-template
-    (fn [db _]
-      (let [template-id (get-in db [:videos/current :template-id])]
-        (get-in db [:templates/all template-id]))))
+(rf/reg-sub-raw :templates/video-count
+  (fn [db _]
+    (reaction
+      (let [aggr (group-by :template-id (vals (get db :videos/all)))
+            cnt  (frequencies aggr)]
+        (js/console.log "freqs" cnt)
+        cnt))))
 
 (rf/reg-sub :templates/all
   (fn [db _] (:templates/all db)))

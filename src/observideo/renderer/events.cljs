@@ -93,7 +93,6 @@
           new-observations   (make-empty-observations template total-observations)
           updated-video      (assoc current-video :template-id id :observations new-observations)
           fullpath           (:filename updated-video)]
-      (js/console.log "updating" :videos/all fullpath updated-video)
       (-> db
         (assoc-in [:videos/current] updated-video)
         (assoc-in [:videos/all fullpath] updated-video)))))
@@ -116,7 +115,6 @@
           observation-index (get-in current-video [:current-section :index])
           updated-video     (assoc-in current-video [:observations observation-index] observation)
           fullpath          (:filename updated-video)]
-      (js/console.log "updating" :videos/all fullpath updated-video)
       (-> db
         (assoc-in [:videos/current] updated-video)
         (assoc-in [:videos/all fullpath] updated-video)))))

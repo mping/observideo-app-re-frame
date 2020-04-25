@@ -14,7 +14,7 @@
 
 (defn- update-template-interval [template intv]
   (let [new-template (assoc template :interval intv)]
-   (rf/dispatch [:ui/update-current-template new-template])))
+    (rf/dispatch [:ui/update-current-template new-template])))
 
 ;; cols
 (defn- add-template-col [e template]
@@ -90,13 +90,13 @@
        [antd/input {:value    tmpl-name
                     :onChange #(update-template-name template (-> % .-target .-value))}]]
 
-      [antd/form-item {:label (str"Interval (secs): " intv)}
-       [antd/slider {:min 1
-                     :max 60
-                     :value intv
-                     :key "slider"
+      [antd/form-item {:label (str "Interval (secs): " intv)}
+       [antd/slider {:min            1
+                     :max            60
+                     :value          intv
+                     :key            "slider"
                      :tooltipVisible false
-                     :onChange #(update-template-interval template %)}]]
+                     :onChange       #(update-template-interval template %)}]]
 
       ;; dynamic fields
       [:table {:style {:width "100%"}}
@@ -128,7 +128,7 @@
          (for [[header v] sorted-attrs
                :let [vals  (:values v)
                      pairs (sort-by last (zipmap vals (range)))]]
-           [:td {:key (str "attr" (:index v))
+           [:td {:key    (str "attr" (:index v))
                  :valign "top"}
             [:table nil
              [:tbody nil
@@ -186,7 +186,8 @@
       [antd/delete-icon] " delete"]]))
 
 (defn- templates-table []
-  (let [templates @(rf/subscribe [:templates/all])]
+  (let [templates           @(rf/subscribe [:templates/all])
+        videos-per-template @(rf/subscribe [:templates/video-count])]
     [:div
      [antd/table {:dataSource (vals templates)
                   :size       "small"
