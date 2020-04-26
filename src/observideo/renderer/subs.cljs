@@ -41,9 +41,8 @@
 (rf/reg-sub-raw :templates/video-count
   (fn [db _]
     (reaction
-      (let [aggr (group-by :template-id (vals (get db :videos/all)))
-            cnt  (frequencies aggr)]
-        (js/console.log "freqs" cnt)
+     (let [aggr (map :template-id (vals (get @db :videos/all)))
+           cnt  (frequencies aggr)]
         cnt))))
 
 (rf/reg-sub :templates/all

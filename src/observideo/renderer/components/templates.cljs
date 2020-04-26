@@ -175,6 +175,11 @@
   (let [clj-record (js->clj record :keywordize-keys true)]
     (str/join ", " (map name (keys (:attributes clj-record))))))
 
+(defn- render-video-count [freqs _ record]
+  (let [clj-record (js->clj record :keywordize-keys true)
+        template-id (:id clj-record)]
+    (get freqs template-id 0)))
+
 (defn- render-actions [_ record]
   (r/as-element
     [:div
@@ -196,6 +201,7 @@
                   :pagination {:position "top"}
                   :title      (constantly "Templates")}
       [antd/column {:title "Name" :dataIndex :name :render render-name}]
+      [antd/column {:title "# Videos" :render (partial render-video-count videos-per-template)}]
       [antd/column {:title "Attributes" :render render-attributes}]
       [antd/column {:title "Actions" :render render-actions}]]
 
