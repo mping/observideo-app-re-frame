@@ -65,6 +65,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "highlight.js": "9.15.10",
     "md5-file": "^5.0.0",
+    "normalize-path": "^3.0.0",
     "rc-field-form": "0.0.0-alpha.16",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",

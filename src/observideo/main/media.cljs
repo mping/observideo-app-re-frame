@@ -3,6 +3,7 @@
    [clojure.string :as s]
    [clojure.walk :as walk]
    [taoensso.timbre :as log]
+   ["normalize-path" :as normalize-path]
    ["fast-glob" :as fast-glob]
    ["fluent-ffmpeg" :as ffmpeg-command]
    ["electron" :as electron :refer [ipcMain]]
@@ -45,9 +46,11 @@
   ;; TODO check if directory exists
   (let [extensions #{".mp4" ".avi"}
         patterns   (map #(str dir "/**/*" %) extensions)
-        result     (fast-glob (clj->js patterns))]
-    (log/debug "Reading directory" dir)
+        normalized (map normalize-path patterns)
+        result     (fast-glob (clj->js normalized))]
+    (log/debug "Reading directory with patterns" normalized)
     (-> result
+        (.then #(do (log/infof "Read files %s" %) %))
         (.then #(js/Promise.all (map read-metadata %)))
         (.then #(js->clj %))
         (.then #(map checksum %))
