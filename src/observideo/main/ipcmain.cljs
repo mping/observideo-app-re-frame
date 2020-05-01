@@ -39,9 +39,9 @@
   ([event data]
    (send-message (web-contents (current-window-id)) event data))
   ([webcontents event data]
-   (log/debugf ">>[%s] %s" event data)
+   ;(log/debugf ">>[%s] %s" event data)
+   (log/debugf ">>[%s]" event)
    (.send webcontents "event" (serde/serialize {:event (subs (str event) 1) :data data}))))
-   ;(.send webcontents "event" (clj->js {:event (subs (str event) 1) :data data}))))
 
 ;; called when the renderer received an ipc message
 (defmulti handle (fn [event _ _] event) :default :unknown)
@@ -60,6 +60,7 @@
   (let [videos-folder (db/read :videos/folder)]
     (send-message sender :main/reset-db @db/db)
     ;; the very first time it may be empty
+    #_
     (when videos-folder
       (handle :ui/update-videos-folder sender {:folder videos-folder}))))
 
@@ -77,7 +78,7 @@
 (defn handle-message [evt jsdata]
   (let [sender (.-sender evt)
         datum  (serde/deserialize jsdata)
-        ;datum  (js->clj jsdata :keywordize-keys true)
         {:keys [event data]} datum]
-    (log/debugf "<<[%s] %s" (keyword event) data)
+    ;(log/debugf "<<[%s] %s" (keyword event) data)
+    (log/debugf "<<[%s]" (keyword event))
     (handle (keyword event) sender data)))

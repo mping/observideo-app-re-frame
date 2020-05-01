@@ -38,16 +38,27 @@
 ;;main listing
 
 (defn- render-filename [text record]
-  (r/as-element [:a {:href "#"
-                     :onClick #(rf/dispatch [:ui/select-video (js->clj record :keywordize-keys true)])}
-                 (fname text)]))
+  (let [clj-obj (js->clj record :keywordize-keys true)
+        missing? (:missing? clj-obj)
+        component (if missing? [:p {:title "The file is missing"}
+                                [antd/warning-icon]
+                                (fname text)]
+
+                               [:a {:href    "#"
+                                    :onClick #(rf/dispatch [:ui/select-video clj-obj])}
+                                (fname text)])]
+    (r/as-element component)))
+
 (defn- render-size [text record]
   (r/as-element [:span text]))
+
 (defn- render-template [text record]
   (let [templates @(rf/subscribe [:templates/all])]
     (r/as-element [:span (get-in templates [text :name])])))
+
 (defn- render-duration [text record]
   (r/as-element [:span (int text) "s"]))
+
 (defn- render-info [val record]
   (let [info (js->clj val :keywordize-keys true)]
     (r/as-element [:span (:a info)])))
@@ -67,7 +78,14 @@
                  :size       "small"
                  :bordered   true
                  :pagination {:position "top"}
-                 :title      #(str "current directory: " folder)}
+                 :title      #(r/as-element
+                                [:span
+                                 (str "current directory: " folder)
+                                 (when folder
+                                   [:a {:title "Reload"
+                                        :onClick (fn [_] (rf/dispatch [:ui/update-videos-folder {:folder folder}]))}
+                                    " "
+                                    [antd/reload-icon]])])}
      [antd/column {:title "File" :dataIndex :filename :key :filename :render render-filename}]
      [antd/column {:title "Size" :dataIndex :size :key :size :render render-size}]
      [antd/column {:title "Template" :dataIndex :template-id :key :template-id :render render-template}]
@@ -79,9 +97,9 @@
                    :render    render-actions}]]))
 
 (defn root []
-  [:div
-   [:p]
-   [antd/button {:type "primary" :onClick #(select-dir)}
-    [antd/upload-icon]
-    " Open a directory"]
-   [videos-table]])
+  (let [folder @(rf/subscribe [:videos/folder])]
+    [:div
+     [antd/button {:type "primary" :onClick #(select-dir)}
+      [antd/upload-icon]
+      " Open a directory"]
+     [videos-table]]))

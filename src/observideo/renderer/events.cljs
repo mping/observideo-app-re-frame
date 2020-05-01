@@ -22,17 +22,35 @@
   :db/reset
   (fn [db [_ server-db]]
     (or server-db db)))
-    ;(merge db server-db)))
 
 ;;;;
 ;; IPC events
+
+(defn videos-merge
+  "merges two video/all maps"
+  [oldm newm]
+  (let [all-videos (set (concat (keys oldm) (keys newm)))]
+    (into {}
+      (for [filename all-videos
+            :let [oldvideo (get oldm filename)
+                  newvideo (get newm filename)
+                  missing? (nil? newvideo)
+                  same?    (= (:md5sum newvideo) (:md5sum oldvideo))
+                  video    (if (or same? missing?) oldvideo newvideo)
+                  video    (assoc video :missing? missing?)]]
+        ;; if the video is the same, keep the data
+        ;; otherwise put a new video, losing all data and template
+        [filename video]))))
 
 (rf/reg-event-db
   :main/update-videos
   [interceptors/queue-save-db]
   (fn [db [_ {:keys [folder videos]}]]
-    (assoc db :videos/folder folder
-              :videos/all (reduce (fn [m v] (assoc m (:filename v) v)) {} videos))))
+    (let [old-videos    (get db :videos/all)
+          new-videos    (reduce (fn [m v] (assoc m (:filename v) v)) {} videos)
+          merged-videos (videos-merge old-videos new-videos)]
+      (assoc db :videos/folder folder
+                :videos/all merged-videos))))
 
 ;;;;
 ;; User events

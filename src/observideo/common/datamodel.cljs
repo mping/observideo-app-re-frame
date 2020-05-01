@@ -13,6 +13,7 @@
                  :info            {:a "changeme"}
                  :md5sum          "changeme"
                  :size            31551484
+                 :missing?         false
                  :current-section {:time 0, :index 0}
                  :observations    [{"Peer" nil "Gender" "Same" "Type" "Exercise"}, {}]
                  :template-id     "7dd2479d-e829-4762-a0ac-de51a68461b5"})
@@ -30,3 +31,6 @@
    ;; templates are keyed by :id because it facilitates CRUD operations
    :templates/all       {(:id demo-template) demo-template} ;; {uuid -> template}
    :templates/current   nil})                               ;; template
+
+
+(defn merge-db [new-db opts])

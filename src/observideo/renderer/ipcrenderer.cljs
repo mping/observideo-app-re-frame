@@ -16,7 +16,8 @@
 
 ;; post messages from renderer to main
 (defn send-message [event data]
-  (log/debugf ">>[%s] %s" event data)
+  ;(log/debugf ">>[%s] %s" event data)
+  (log/debugf ">>[%s]" event)
   (.send ipcRenderer "event" (serde/serialize {:event (subs (str event) 1) :data data})))
 
 ;; called when the renderer received an ipc message
@@ -38,5 +39,6 @@
   (let [sender      (.-sender evt)
         datum (serde/deserialize jsdata)
         {:keys [event data]} datum]
-    (log/debugf "<<[%s] %s" event data)
+    ;(log/debugf "<<[%s] %s" event data)
+    (log/debugf "<<[%s]" event)
     (handle (keyword event) sender data)))

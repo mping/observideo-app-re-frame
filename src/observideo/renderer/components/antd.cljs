@@ -6,7 +6,8 @@
                             Form Select Input Slider Icon Affix]]
             ["@ant-design/icons" :refer [VideoCameraOutlined TagsOutlined BarChartOutlined
                                          UploadOutlined EditOutlined DeleteOutlined SaveOutlined
-                                         PlusCircleOutlined MinusCircleOutlined MinusOutlined PlusOutlined]]))
+                                         PlusCircleOutlined MinusCircleOutlined MinusOutlined PlusOutlined
+                                         WarningOutlined ReloadOutlined]]))
 
 
 (comment
@@ -29,6 +30,7 @@
 (def queries-icon (.-render BarChartOutlined))
 
 (def upload-icon (.-render UploadOutlined))
+(def reload-icon (.-render ReloadOutlined))
 (def edit-icon (.-render EditOutlined))
 (def delete-icon (.-render DeleteOutlined))
 (def save-icon (.-render SaveOutlined))
@@ -37,6 +39,7 @@
 (def minus-circle-icon (.-render MinusCircleOutlined))
 (def minus-icon (.-render MinusOutlined))
 (def plus-icon (.-render PlusOutlined))
+(def warning-icon (.-render WarningOutlined))
 
 ;;;;
 ;;

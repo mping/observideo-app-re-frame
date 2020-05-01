@@ -25,12 +25,12 @@
   (assoc video "md5sum" (.sync md5 filename)))
 
 (defn db-info [video]
-  ;; TODO enhance with db info
-  (merge video {"info" {:a "changeme"}}))
+  (merge video {"missing" false
+                "info" {:a "changeme"}}))
 
 (defn filter-keys [video]
   (-> video
-    (select-keys ["filename" "size" "duration" "info" "md5sum"])
+    (select-keys ["filename" "size" "duration" "info" "md5sum" "missing"])
     (walk/keywordize-keys)))
 
 (defn read-metadata [path]
