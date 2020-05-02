@@ -30,7 +30,7 @@
 
 (defn- init-menu
   []
-  (let [name     (.getName app)
+  (let [name     (.-name app)
         template (cond-> []
                    :always
                    (-> (concat [#_{:label   "File"
