@@ -35,7 +35,8 @@
             :let [oldvideo (get oldm filename)
                   newvideo (get newm filename)
                   missing? (nil? newvideo)
-                  same?    (= (:md5sum newvideo) (:md5sum oldvideo))
+                  same?    (= (:md5sum newvideo)
+                              (:md5sum oldvideo))
                   video    (if (or same? missing?) oldvideo newvideo)
                   video    (assoc video :missing? missing?)]]
         ;; if the video is the same, keep the data

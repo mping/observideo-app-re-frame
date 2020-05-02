@@ -4,6 +4,7 @@
             [reagent.core :as r]
             [re-frame.core :as rf]
             [taoensso.timbre :as log]
+            [observideo.common.utils :as utils]
             [observideo.renderer.ipcrenderer :as ipcrenderer]
             [observideo.renderer.components.video-edit :as video-edit]
             [observideo.renderer.components.antd :as antd]
@@ -14,9 +15,6 @@
 (defonce remote (.-remote electron))
 (defonce dialog (.-dialog remote))
 
-(defn fname [path]
-  ;;TODO use os.separator
-  (subs path (inc (s/last-index-of path "/"))))
 
 ;;;;
 ;; actions
@@ -38,15 +36,17 @@
 ;;main listing
 
 (defn- render-filename [text record]
-  (let [clj-obj (js->clj record :keywordize-keys true)
-        missing? (:missing? clj-obj)
+  (let [folder    @(rf/subscribe [:videos/folder])
+        filename  (utils/relname folder text)
+        clj-obj   (js->clj record :keywordize-keys true)
+        missing?  (:missing? clj-obj)
         component (if missing? [:p {:title "The file is missing"}
                                 [antd/warning-icon]
-                                (fname text)]
+                                filename]
 
-                               [:a {:href    "#"
-                                    :onClick #(rf/dispatch [:ui/select-video clj-obj])}
-                                (fname text)])]
+                      [:a {:href    "#"
+                           :onClick #(rf/dispatch [:ui/select-video clj-obj])}
+                       filename])]
     (r/as-element component)))
 
 (defn- render-size [text record]

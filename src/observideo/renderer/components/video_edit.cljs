@@ -4,6 +4,7 @@
             [reagent.core :as r]
             [re-frame.core :as rf]
             [taoensso.timbre :as log]
+            [observideo.common.utils :as utils]
             [observideo.renderer.ipcrenderer :as ipcrenderer]
             [observideo.renderer.components.antd :as antd]
             [observideo.renderer.components.player :as player]))
@@ -13,9 +14,6 @@
 (defonce remote (.-remote electron))
 (defonce dialog (.-dialog remote))
 
-(defn fname [path]
-  ;;TODO use os.separator
-  (subs path (inc (s/last-index-of path "/"))))
 
 (defn- select-template [video id]
   (rf/dispatch [:ui/update-current-video-template (str id)]))
@@ -90,7 +88,7 @@
           ;;;;
           ;; left col - video player
           [antd/col {:span 12}
-           [antd/page-header {:title  (fname filename) :subTitle filename
+           [antd/page-header {:title  (utils/fname filename) :subTitle filename
                               :onBack #(rf/dispatch [:ui/deselect-video])}]
            [player/video-player {:playsInline true
                                  :src         (str "file://" (:filename video))
@@ -130,6 +128,7 @@
            ;; affix sticks it on top
            [antd/affix {}
             [observation-table]]]]
+         #_#_
          [:hr]
          [antd/row
           [:h1 "Here:" (:time section) "|" (:index section)]]]))))

@@ -2,11 +2,15 @@
   (:require
    [taoensso.timbre :as log]
    [cognitect.transit :as t]
+   [clojure.spec.alpha :as s]
+   [observideo.common.datamodel :as datamodel]
+   [goog.functions]
    ["electron" :as electron :refer [ipcMain app BrowserWindow crashReporter]]
    ["path" :as path]
    ["fs" :as fs]
    ["os" :as os]
-   ["url" :as url]))
+   ["url" :as url])
+  (:import [goog.async Debouncer]))
 
 
 (def electron (js/require "electron"))
@@ -29,6 +33,11 @@
 (defn- unwrap [wrapped]
   (get wrapped :data))
 
+(defn- debounce [f interval]
+  (let [dbnc (Debouncer. f interval)]
+    ;; We use apply here to support functions of various arities
+    (fn [& args] (.apply (.-fire dbnc) dbnc (to-array args)))))
+
 (defn- read-db []
   (log/infof "Reading entire db at %s" db-file)
   (if (fs/existsSync db-file)
@@ -38,15 +47,23 @@
           clj-data  (t/read reader data)
           unwrapped (unwrap clj-data)]
       (reset! db unwrapped))
-    ;else
+                                        ;else
     (log/warnf "File does not exist: %s" db-file)))
 
-(defn overwrite [data]
+(defn- overwrite* [data]
+  ;;TODO debounce db updates
   (log/infof "Updating entire db at %s" db-file)
   (let [writer (t/writer :json-verbose)
-        wrapped (wrap data)]
+        wrapped (wrap data)
+        valid?  (s/valid? datamodel/db-spec data)]
+    (when-not valid?
+      (log/warn "Updating with invalid data")
+      (s/explain datamodel/db-spec data))
     ;; lame, should be async
     (fs/writeFileSync db-file (t/write writer wrapped))))
+
+;; debounced version
+(def overwrite (goog.functions.debounce overwrite* 500))
 
 (defn read [k]
   (get @db k))

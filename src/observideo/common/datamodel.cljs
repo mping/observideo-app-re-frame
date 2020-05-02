@@ -47,15 +47,25 @@
 
 (def video-spec
   (ds/spec {:name ::video
-            :spec {:filename        string?
-                   :duration        number?
-                   :info            any?
-                   :md5sum          string?
-                   :size            int?
-                   :missing?        boolean?
-                   :current-section section-spec
-                   :observations    [observation-spec]
-                   :template-id     string?}}))
+            :spec {:filename                 string?
+                   :duration                 number?
+                   :info                     any?
+                   :md5sum                   string?
+                   :size                     int?
+                   :missing?                 boolean?
+                   (ds/opt :current-section) section-spec
+                   (ds/opt :observations)    [observation-spec]
+                   (ds/opt :template-id)     string?}}))
+
+(def db-spec
+  (ds/spec {:name ::db
+            :spec {:observideo/filename (s/nilable string?)
+                   :ui/tab              keyword?
+                   :videos/folder       (s/nilable string?) 
+                   :videos/all          (s/nilable (s/map-of string? video-spec))
+                   :videos/current      (s/nilable video-spec)
+                   :templates/all       (s/nilable (s/map-of string? template-spec))
+                   :templates/current   (s/nilable template-spec)}})) 
 
 (defn empty-db []
   {:observideo/filename nil

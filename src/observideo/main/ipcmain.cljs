@@ -57,12 +57,8 @@
 
 
 (defmethod handle :ui/ready [_ sender _]
-  (let [videos-folder (db/read :videos/folder)]
-    (send-message sender :main/reset-db @db/db)
+  (send-message sender :main/reset-db @db/db))
     ;; the very first time it may be empty
-    #_
-    (when videos-folder
-      (handle :ui/update-videos-folder sender {:folder videos-folder}))))
 
 (defmethod handle :db/update [event sender data]
   (db/overwrite data))

@@ -4,6 +4,7 @@
             [reagent.core :as r]
             [re-frame.core :as rf]
             [taoensso.timbre :as log]
+            [observideo.common.utils :as utils]
             [observideo.renderer.ipcrenderer :as ipcrenderer]
             [observideo.renderer.components.video-edit :as video-edit]
             [observideo.renderer.components.video-list :as video-list]
@@ -14,9 +15,6 @@
 (defonce remote (.-remote electron))
 (defonce dialog (.-dialog remote))
 
-(defn fname [path]
-  ;;TODO use os.separator
-  (subs path (inc (s/last-index-of path "/"))))
 
 ;;;;
 ;; actions
@@ -47,7 +45,7 @@
      [antd/breadcrumb-item
       [:a {:onClick #(rf/dispatch [:ui/deselect-video])} folder]]
      (when vname
-       [antd/breadcrumb-item (fname vname)])]))
+       [antd/breadcrumb-item (utils/fname vname)])]))
 
 (defn ui []
   (let [current @(rf/subscribe [:videos/current])]
