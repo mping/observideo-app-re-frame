@@ -57,7 +57,7 @@
 
                  [:tr {:key rowkey}
                   [:td {:key     tdkey
-                        :style {:background (when attribute-on? "red")}
+                        :style {:background (when attribute-on? "#1890ff")}
                         :onClick #(rf/dispatch [:ui/update-current-video-current-section-observation
                                                 (assoc observation header attribute)])}
                    attribute]])]]])]]]]]]))
