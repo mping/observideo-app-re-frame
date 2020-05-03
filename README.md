@@ -1,8 +1,7 @@
 # shadow-electron-starter
 ClojureScript + Shadow-cljs + Electron + re-frame
 
-[![Build](https://travis-ci.com/github/mping/observideo-app-re-frame.svg?branch=master)](https://travis-ci.com/github/mping/observideo-app-re-frame)
-
+[![Build Status](https://travis-ci.com/mping/observideo-app-re-frame.svg?branch=master)](https://travis-ci.com/mping/observideo-app-re-frame)
 
 ## How to Run
 ```
