@@ -1,14 +1,10 @@
 (ns observideo.main.media
   (:require 
-   [clojure.string :as s]
    [clojure.walk :as walk]
    [taoensso.timbre :as log]
    ["normalize-path" :as normalize-path]
    ["fast-glob" :as fast-glob]
    ["fluent-ffmpeg" :as ffmpeg-command]
-   ["electron" :as electron :refer [ipcMain]]
-   ["path" :as path]
-   ["url" :as url]
    ["md5-file" :as md5]))
 
 ;;;;
