@@ -1,3 +1,6 @@
+language: java
+jdk:
+  - oraclejdk11
 matrix:
   include:
     - os: osx
@@ -29,15 +32,19 @@ cache:
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
 
+before_install:
+  - wget https://raw.githubusercontent.com/creationix/nvm/v0.31.0/nvm.sh -O ~/.nvm/nvm.sh
+  - source ~/.nvm/nvm.sh
+  - nvm install 11
+  - node --version
+
 install:
   - |
     if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       brew install yarn;
     fi
 script:
-  - jdk_switcher use openjdk11
-  - export JAVA_HOME=$HOME/openjdk11
-  - export $PATH=$PATH:$JAVA_HOME/bin
+  - export PATH=$PATH:$JAVA_HOME/bin
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
       docker run --rm \
