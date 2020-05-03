@@ -1,0 +1,51 @@
+# taken from https://github.com/thheller/shadow-cljs/blob/master/.circleci/config.yml
+defaults: &defaults
+  docker:
+    - image: thheller/cljs-dev:latest
+  environment:
+    LEIN_ROOT: "true"
+    # Customize the JVM maximum heap limit
+    JVM_OPTS: -Xmx3200m
+
+version: 2
+
+jobs:
+  build_windows:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Install node/npm
+          command: |
+            curl -sL https://deb.nodesource.com/setup_4.x | bash -
+            apt-get install -y nodejs
+      - run: npm install 
+      - run: npm run release
+      - run: npm run dist --win
+
+  build_macos:
+    <<: *defaults
+    macos:
+      xcode: "10.0.0"
+    steps:
+      - checkout
+      - run: security create-keychain -p $KEYCHAIN_PASSWORD build.keychain
+      - run: security default-keychain -s build.keychain
+      - run: security unlock-keychain -p $KEYCHAIN_PASSWORD build.keychain
+      - run: echo $KEYSTORE | base64 --decode - > keystore.p12
+      - run: security import keystore.p12 -k build.keychain -P $KEYCHAIN_PASSWORD -T /usr/bin/codesign
+      - run:
+          name: Install node/npm
+          command: |
+            curl -sL https://deb.nodesource.com/setup_4.x | bash -
+            apt-get install -y nodejs
+      - run: npm install 
+      - run: npm run release
+      - run: npm run dist --mac
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build_windows
+      - build_macos
