@@ -24,6 +24,7 @@ cache:
     - node_modules
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
+    - $HOME/.m2/repository
 
 install:
   - |
@@ -31,15 +32,19 @@ install:
       brew install yarn;
     fi
 script:
-  - npm install
-  - npm run release
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      npm run dist --win"
+      npm install
+      npm run release
+      npm run dist
     elif [ "$TRAVIS_OS_NAME" == "windows" ]; then
+      npm install
+      npm run release
       npm run dist --win
     else
-      npm run dist --mac
+      yarn install
+      yarn run release
+      yarn run dist --mac
     fi
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
