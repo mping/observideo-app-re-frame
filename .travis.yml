@@ -1,6 +1,3 @@
-language: java
-jdk:
-  - oraclejdk11
 matrix:
   include:
     - os: osx
@@ -20,11 +17,7 @@ matrix:
 
     - os: linux
       services: docker
-      language: generic
-
-jdk:
-  - oraclejdk11
-
+      language: java
 cache:
   yarn: true
   directories:
@@ -32,41 +25,21 @@ cache:
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
 
-before_install:
-  - wget https://raw.githubusercontent.com/creationix/nvm/v0.31.0/nvm.sh -O ~/.nvm/nvm.sh
-  - source ~/.nvm/nvm.sh
-  - nvm install 11
-  - node --version
-
 install:
   - |
     if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       brew install yarn;
     fi
 script:
-  - export PATH=$PATH:$JAVA_HOME/bin
+  - npm install
+  - npm run release
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      docker run --rm \
-        -e GH_TOKEN=$GH_TOKEN \
-        -v $PWD:/project \
-        -v ~/.cache/electron:/root/.cache/electron \
-        -v ~/.cache/electron-builder:/root/.cache/electron-builder \
-        electronuserland/builder:wine \
-        /bin/bash -c "yarn install --link-duplicates --pure-lockfile && yarn release && yarn dist --win"
+      npm run dist --win"
     elif [ "$TRAVIS_OS_NAME" == "windows" ]; then
-      npm install;
-      npm run release;
-      npm run dist;
+      npm run dist --win
     else
-      security create-keychain -p $KEYCHAIN_PASSWORD build.keychain;
-      security default-keychain -s build.keychain;
-      security unlock-keychain -p $KEYCHAIN_PASSWORD build.keychain;
-      echo $KEYSTORE | base64 --decode - > keystore.p12;
-      security import keystore.p12 -k build.keychain -P $KEYCHAIN_PASSWORD -T /usr/bin/codesign;
-      yarn install;
-      yarn release;
-      yarn dist;
+      npm run dist --mac
     fi
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
