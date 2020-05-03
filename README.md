@@ -1,4 +1,4 @@
-# shadow-electron-starter
+# Observideo
 ClojureScript + Shadow-cljs + Electron + re-frame
 
 [![Build Status](https://travis-ci.com/mping/observideo-app-re-frame.svg?branch=master)](https://travis-ci.com/mping/observideo-app-re-frame)
@@ -10,6 +10,7 @@ npm install shadow-cljs -g
 npm install
 
 npm run dev
+# on another shell
 ./node_modules/bin/electron .
 ```
 
