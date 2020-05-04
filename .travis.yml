@@ -5,9 +5,6 @@ os: osx
 osx_image: xcode11.3
 language: node_js
 node_js: "lts/*"
-env:
-  - ELECTRON_CACHE=$HOME/.cache/electron
-  - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
   
 cache:
   yarn: true
@@ -18,31 +15,21 @@ cache:
     - $HOME/.m2/repository
 
 install:
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      brew install yarn;
-    fi
+  - yarn
 
 script:
   - |
-    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      npm install
-      npm run release
-      npm run dist
-    elif [ "$TRAVIS_OS_NAME" == "windows" ]; then
-      npm install
-      npm run release
-      npm run dist --win
-    else
-      security create-keychain -p $KEYCHAIN_PASSWORD build.keychain;
-      security default-keychain -s build.keychain;
-      security unlock-keychain -p $KEYCHAIN_PASSWORD build.keychain;
-      echo $KEYSTORE | base64 --decode - > keystore.p12;
-      security import keystore.p12 -k build.keychain -P $KEYCHAIN_PASSWORD -T /usr/bin/codesign;
-      yarn install
-      yarn run release
-      yarn run dist-mwl
-    fi
+    export ELECTRON_CACHE=$HOME/.cache/electron
+    export ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+    
+    security create-keychain -p $KEYCHAIN_PASSWORD build.keychain;
+    security default-keychain -s build.keychain;
+    security unlock-keychain -p $KEYCHAIN_PASSWORD build.keychain;
+    echo $KEYSTORE | base64 --decode - > keystore.p12;
+    security import keystore.p12 -k build.keychain -P $KEYCHAIN_PASSWORD -T /usr/bin/codesign;
+    yarn install
+    yarn run release
+    yarn run dist-mwl
     
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
