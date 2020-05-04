@@ -22,6 +22,7 @@ install:
     if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       brew install yarn;
     fi
+
 script:
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
@@ -37,10 +38,16 @@ script:
       yarn run release
       yarn run dist-mwl
     fi
+    
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
   
-  # TODO publish artifacts?
-  # dist/observideo_1.0.0_amd64.deb
-  # dist/observideo Setup 1.0.0.exe 
-  # dist/observideo-1.0.0-mac.zip
+deploy:
+  provider: releases
+  api_key: $GITHUB_OAUTH_TOKEN  
+  file:
+    - dist/observideo_1.0.0_amd64.deb
+    - dist/observideo Setup 1.0.0.exe
+    - dist/observideo-1.0.0-mac.zip
+  on:
+    tags: true
