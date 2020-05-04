@@ -44,7 +44,7 @@ script:
     else
       yarn install
       yarn run release
-      yarn run dist --mac
+      yarn run dist --mwl
     fi
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
