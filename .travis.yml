@@ -42,7 +42,6 @@ deploy:
     - dist/observideo-amd64.deb
     - dist/observideo-Setup.exe
     - dist/observideo-mac.zip
-  draft: true
   skip_cleanup: true
-  #on:
-  #  tags: true
+  on:
+    tags: true
