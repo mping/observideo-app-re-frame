@@ -28,7 +28,7 @@ script:
     echo $KEYSTORE | base64 --decode - > keystore.p12;
     security import keystore.p12 -k build.keychain -P $KEYCHAIN_PASSWORD -T /usr/bin/codesign;
     yarn install
-    yarn run release
+    yarn run build
     yarn run dist-mwl
     
 before_cache:
