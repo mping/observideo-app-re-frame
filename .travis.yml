@@ -1,23 +1,14 @@
-matrix:
-  include:
-    - os: osx
-      osx_image: xcode11.3
-      language: node_js
-      node_js: "lts/*"
-      env:
-        - ELECTRON_CACHE=$HOME/.cache/electron
-        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+# electron-builder can target win,mac and linux
+# just use it for everything
 
-    # Windows currently doesn't support encrypted variables.
-    # Once supported uncomment this out & remove build with Docker
-    #
-    #- os: windows
-    #  language: node_js
-    #  node_js: "8"
-
-    - os: linux
-      services: docker
-      language: java
+os: osx
+osx_image: xcode11.3
+language: node_js
+node_js: "lts/*"
+env:
+  - ELECTRON_CACHE=$HOME/.cache/electron
+  - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+  
 cache:
   yarn: true
   directories:
@@ -31,6 +22,7 @@ install:
     if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       brew install yarn;
     fi
+
 script:
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
@@ -49,7 +41,18 @@ script:
       security import keystore.p12 -k build.keychain -P $KEYCHAIN_PASSWORD -T /usr/bin/codesign;
       yarn install
       yarn run release
-      yarn run dist --mac
+      yarn run dist-mwl
     fi
+    
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
+  
+deploy:
+  provider: releases
+  api_key: $GITHUB_OAUTH_TOKEN  
+  file:
+    - dist/observideo_1.0.0_amd64.deb
+    - dist/observideo Setup 1.0.0.exe
+    - dist/observideo-1.0.0-mac.zip
+  on:
+    tags: true

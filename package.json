@@ -1,7 +1,7 @@
 {
   "name": "observideo",
   "homepage": "https://observideo.com",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Observideo is an app for categorizing video segments",
   "main": "resources/main.js",
   "scripts": {
