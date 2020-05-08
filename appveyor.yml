@@ -1,0 +1,19 @@
+image: macos
+
+cache:
+  - node_modules
+  - $HOME/.cache/electron
+  - $HOME/.cache/electron-builder
+  - $HOME/.m2/repository
+
+init:
+  - git config --global core.autocrlf input
+
+install:
+  - yarn install
+
+build_script:
+  - yarn build
+  - yarn dist-mwl
+
+test: off
