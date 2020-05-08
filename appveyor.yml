@@ -10,10 +10,10 @@ init:
   - git config --global core.autocrlf input
 
 install:
-  - yarn install
+  - npm install
 
 build_script:
-  - yarn build
-  - yarn dist-mwl
+  - npm run build
+  - npm run dist-mwl
 
 test: off
