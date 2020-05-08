@@ -44,5 +44,6 @@ deploy:
     - dist/observideo-Setup.exe
     - dist/observideo-mac.zip
   skip_cleanup: true
+  overwrite: true
   on:
     tags: true
