@@ -21,18 +21,18 @@ build_script:
   - npm run dist-mwl
   
 artifacts:
-  - path: dist/observideo-*.deb
+  - path: dist/observideo*.deb
     name: amd64
-  - path: dist/observideo-*.AppImage
+  - path: dist/observideo*.AppImage
     name: appimg
-  - path: dist/observideo-*.exe
+  - path: dist/observideo*.exe
     name: win
-  - path: dist/observideo-*.zip
+  - path: dist/observideo*.zip
     name: macos
 
 deploy:
-    release: APPVEYOR_REPO_TAG_NAME
-    description: 'Release of observideo $(APPVEYOR_REPO_TAG_NAME) tag created by AppVeyor build $(appveyor_build_version)'
+    release: $(APPVEYOR_REPO_TAG_NAME)
+    description: 'Release of observideo $(APPVEYOR_REPO_TAG_NAME) tag created by AppVeyor build $(APPVEYOR_BUILD_VERSION)'
     provider: GitHub
     auth_token:
       secure: V4lriE7c/Z9saEfYt41MbVac9O9eA7+8SotGa1f4F78M/1CwurPWEmM8EznBNfW9
