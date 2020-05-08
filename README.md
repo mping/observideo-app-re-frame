@@ -10,6 +10,7 @@ npm install shadow-cljs -g
 npm install
 
 npm run dev
+
 # on another shell
 ./node_modules/bin/electron .
 ```
