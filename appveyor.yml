@@ -1,8 +1,8 @@
 image: macos
 
 environment:
-  - ELECTRON_CACHE: ~/.cache/electron
-  - ELETCRON_BUILDER_CACHE: ~/.cache/electron-builder
+  ELECTRON_CACHE: ~/.cache/electron
+  ELETCRON_BUILDER_CACHE: ~/.cache/electron-builder
 
 cache:
   - node_modules
