@@ -21,11 +21,13 @@ build_script:
   - npm run dist-mwl
   
 artifacts:
-  - path: dist/observideo-amd64.deb
+  - path: dist/observideo-*.deb
     name: amd64
-  - path: dist/observideo-Setup.exe
+  - path: dist/observideo-*.AppImage
+    name: appimg
+  - path: dist/observideo-*.exe
     name: win
-  - path: dist/observideo-mac.zip
+  - path: dist/observideo-*.zip
     name: macos
 
 deploy:
