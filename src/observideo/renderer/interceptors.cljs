@@ -1,6 +1,5 @@
 (ns observideo.renderer.interceptors
   (:require [re-frame.core :as r]
-            [taoensso.timbre :as log]
             [observideo.renderer.ipcrenderer :as ipcrenderer]))
 
 ;; sends the event as an IPC message

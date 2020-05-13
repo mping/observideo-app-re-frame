@@ -4,9 +4,7 @@
    [observideo.main.db :as db]
    [taoensso.timbre :as log]
    [observideo.common.serde :as serde]
-   ["electron" :as electron :refer [BrowserWindow remote app ipcRender ipcMain]]
-   ["path" :as path]
-   ["url" :as url]))
+   ["electron" :as electron :refer [BrowserWindow remote app ipcRender ipcMain]]))
 
 ;;;;
 ;; utils

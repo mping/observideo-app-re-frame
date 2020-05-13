@@ -79,6 +79,3 @@
    ;; templates are keyed by :id because it facilitates CRUD operations
    :templates/all       {(:id demo-template) demo-template} ;; {uuid -> template}
    :templates/current   nil})                               ;; template
-
-
-(defn merge-db [new-db opts])

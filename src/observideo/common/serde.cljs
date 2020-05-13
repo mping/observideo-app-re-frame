@@ -6,14 +6,14 @@
 (def reader (t/reader :json))
 (def writer (t/writer :json))
 
-(defn- serialize [cljdata]
+(defn serialize [cljdata]
   (let [start  (.getTime (js/Date.))
         result (t/write writer cljdata)
         end    (.getTime (js/Date.))]
     (log/debug "Serialized in" (- end start) "ms")
     result))
 
-(defn- deserialize [s]
+(defn deserialize [s]
   (let [start  (.getTime (js/Date.))
         result (t/read reader s)
         end    (.getTime (js/Date.))]

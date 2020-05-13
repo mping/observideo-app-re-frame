@@ -6,12 +6,7 @@
    [observideo.common.datamodel :as datamodel]
    [goog.functions]
    ["electron" :as electron :refer [ipcMain app BrowserWindow crashReporter]]
-   ["path" :as path]
-   ["fs" :as fs]
-   ["os" :as os]
-   ["url" :as url])
-  (:import [goog.async Debouncer]))
-
+   ["fs" :as fs])) 
 
 (def electron (js/require "electron"))
 (def app (.-app electron))
@@ -33,10 +28,11 @@
 (defn- unwrap [wrapped]
   (get wrapped :data))
 
-(defn- debounce [f interval]
-  (let [dbnc (Debouncer. f interval)]
-    ;; We use apply here to support functions of various arities
-    (fn [& args] (.apply (.-fire dbnc) dbnc (to-array args)))))
+(defn- reset-view [data]
+  (-> data
+      (assoc :ui/tab :videos
+             :videos/current nil
+             :templates/current nil)))
 
 (defn- read-db []
   (log/infof "Reading entire db at %s" db-file)
@@ -54,11 +50,12 @@
   ;;TODO debounce db updates
   (log/infof "Updating entire db at %s" db-file)
   (let [writer (t/writer :json-verbose)
-        wrapped (wrap data)
-        valid?  (s/valid? datamodel/db-spec data)]
+        resetted (reset-view data)
+        wrapped  (wrap resetted)
+        valid?  (s/valid? datamodel/db-spec resetted)]
     (when-not valid?
       (log/warn "Updating with invalid data")
-      (s/explain datamodel/db-spec data))
+      (s/explain datamodel/db-spec resetted))
     ;; lame, should be async
     (fs/writeFileSync db-file (t/write writer wrapped))))
 

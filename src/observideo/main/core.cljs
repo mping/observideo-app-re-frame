@@ -1,13 +1,8 @@
 (ns observideo.main.core
   (:require
-   [taoensso.timbre :as log]
    [observideo.main.ipcmain :as ipc]
    [observideo.main.db :as db]
-   ["electron" :as electron :refer [ipcMain app BrowserWindow crashReporter]]
-   ["path" :as path]
-   ["os" :as os]
-   ["url" :as url]))
-
+   ["electron" :as electron :refer [ipcMain app BrowserWindow crashReporter]]))
 
 (def electron (js/require "electron"))
 (def homedir (.homedir (js/require "os")))
