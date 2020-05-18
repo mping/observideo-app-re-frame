@@ -181,3 +181,11 @@
 (rf/reg-event-db
   :ui/deselect-template
   (fn [db [_ _]] (assoc db :templates/current nil)))
+
+
+;;;;
+;; exports
+(rf/reg-event-db
+  :db/export
+  [interceptors/event->ipc]
+  (fn [db _] db))

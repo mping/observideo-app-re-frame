@@ -1,10 +1,12 @@
 (ns observideo.main.ipcmain
   (:require
-   [observideo.main.media :as media]
-   [observideo.main.db :as db]
-   [taoensso.timbre :as log]
-   [observideo.common.serde :as serde]
-   ["electron" :as electron :refer [BrowserWindow remote app ipcRender ipcMain]]))
+    [observideo.main.media :as media]
+    [observideo.main.db :as db]
+    [taoensso.timbre :as log]
+    [observideo.common.serde :as serde]
+    ["electron" :as electron :refer [BrowserWindow remote app ipcRender ipcMain]]
+    ["electron-dl" :as electron-dl :refer [electronDl download]]
+    [promesa.core :as p]))
 
 ;;;;
 ;; utils
@@ -14,6 +16,10 @@
 
 (defn- browser-window-ctor []
   (or BrowserWindow (.-BrowserWindow remote)))
+
+(defn- current-focused-window []
+  (->> (browser-window-ctor)
+    .getFocusedWindow))
 
 (defn current-window-id []
   (->> (browser-window-ctor)
@@ -60,6 +66,16 @@
 
 (defmethod handle :db/update [event sender data]
   (db/overwrite data))
+
+(defmethod handle :db/query [event sender data]
+  (println "IMPLEMENT ME"))
+
+(defmethod handle :db/export [event sender data]
+  (let [url (db/export-to-csv)]
+    (-> url
+        (p/then #(download (current-focused-window) % #js {:saveAs true :openFolderWhenDone true}))
+        (p/then #(log/infof "Export done" %)))))
+
 
 ;;;;
 ;; ipc/ui

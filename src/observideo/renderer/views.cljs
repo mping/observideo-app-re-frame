@@ -3,6 +3,7 @@
             [observideo.renderer.components.antd :as antd]
             [observideo.renderer.components.templates :as templates]
             [observideo.renderer.components.queries :as queries]
+            [observideo.renderer.components.exports :as exports]
             [observideo.renderer.components.videos :as videos]))
 
 (defn selected-tab [active]
@@ -10,6 +11,7 @@
     :queries queries/ui
     :templates templates/ui
     :videos videos/ui
+    :exports exports/ui
     ;;default
     [:h1 (str "Unknown: " active)]))
 
@@ -29,8 +31,11 @@
          [:span "Templates"]]
         [antd/menuitem {:key "queries" :onClick #(rf/dispatch [:ui/change-active-tab :queries])}
          [antd/queries-icon]
-         [:span "Queries"]]]]]
-     
+         [:span "Queries"]]
+        [antd/menuitem {:key "exports" :onClick #(rf/dispatch [:ui/change-active-tab :exports])}
+         [antd/download-icon]
+         [:span "Export"]]]]]
+
      [antd/content {:style {:background "#fff" :padding "5px"}}
       [(selected-tab active)]]
 

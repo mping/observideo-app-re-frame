@@ -5,7 +5,7 @@
                             Row Col
                             Form Select Input Slider Icon Affix]]
             ["@ant-design/icons" :refer [VideoCameraOutlined TagsOutlined BarChartOutlined
-                                         UploadOutlined EditOutlined DeleteOutlined SaveOutlined
+                                         UploadOutlined EditOutlined DeleteOutlined SaveOutlined DownloadOutlined
                                          PlusCircleOutlined MinusCircleOutlined MinusOutlined PlusOutlined
                                          WarningOutlined ReloadOutlined]]))
 
@@ -30,6 +30,7 @@
 (def queries-icon (.-render BarChartOutlined))
 
 (def upload-icon (.-render UploadOutlined))
+(def download-icon (.-render DownloadOutlined))
 (def reload-icon (.-render ReloadOutlined))
 (def edit-icon (.-render EditOutlined))
 (def delete-icon (.-render DeleteOutlined))

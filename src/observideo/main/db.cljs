@@ -1,12 +1,13 @@
 (ns observideo.main.db
   (:require
-   [taoensso.timbre :as log]
-   [cognitect.transit :as t]
-   [clojure.spec.alpha :as s]
-   [observideo.common.datamodel :as datamodel]
-   [goog.functions]
-   ["electron" :as electron :refer [ipcMain app BrowserWindow crashReporter]]
-   ["fs" :as fs])) 
+    [taoensso.timbre :as log]
+    [cognitect.transit :as t]
+    [clojure.spec.alpha :as s]
+    [observideo.common.datamodel :as datamodel]
+    [goog.functions]
+    ["electron" :as electron :refer [ipcMain app BrowserWindow crashReporter]]
+    ["fs" :as fs]
+    [promesa.core :as p]))
 
 (def electron (js/require "electron"))
 (def app (.-app electron))
@@ -64,6 +65,10 @@
 
 (defn read [k]
   (get @db k))
+
+(defn export-to-csv []
+  ;; export db to csv, returning a file path
+  (p/resolved "file:///home/mping/Devel/workspace/observideo/package.json"))
 
 (defn init []
   (log/infof "Initializing")

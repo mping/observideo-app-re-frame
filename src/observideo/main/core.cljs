@@ -5,8 +5,6 @@
    ["electron" :as electron :refer [ipcMain app BrowserWindow crashReporter]]))
 
 (def electron (js/require "electron"))
-(def homedir (.homedir (js/require "os")))
-(def dialog electron/dialog)
 (def app  (.-app electron))
 (def menu (.-Menu electron))
 (def browser-window (.-BrowserWindow electron))
