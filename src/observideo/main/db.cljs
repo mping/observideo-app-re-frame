@@ -66,8 +66,9 @@
 (defn read [k]
   (get @db k))
 
-(defn export-to-csv []
-  ;; export db to csv, returning a file path
+(defn export-to-csv [{:keys [by] :as opts}]
+  ;; TODO export db to csv, returning a file path
+  (println "EXPORT" opts)
   (p/resolved "file:///home/mping/Devel/workspace/observideo/package.json"))
 
 (defn init []

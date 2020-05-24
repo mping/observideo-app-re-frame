@@ -71,7 +71,7 @@
   (println "IMPLEMENT ME"))
 
 (defmethod handle :db/export [event sender data]
-  (let [url (db/export-to-csv)]
+  (let [url (db/export-to-csv data)]
     (-> url
         (p/then #(download (current-focused-window) % #js {:saveAs true :openFolderWhenDone true}))
         (p/then #(log/infof "Export done" %)))))
