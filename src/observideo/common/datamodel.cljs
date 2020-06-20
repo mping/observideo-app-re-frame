@@ -1,6 +1,7 @@
 (ns observideo.common.datamodel
   (:require [spec-tools.data-spec :as ds]
-            [clojure.spec.alpha :as s]))
+            [clojure.spec.alpha :as s]
+            [taoensso.timbre :as log]))
 
 (def demo-template {:id         "fb52dd46-85cc-4864-b11e-44b8a5b28331"
                     :name       "Demo"
@@ -17,7 +18,7 @@
                  :info            {:a "changeme"}
                  :md5sum          "changeme"
                  :size            31551484
-                 :missing?         false
+                 :missing?        false
                  :current-section {:time 0, :index 0}
                  :observations    [{"Peer" nil "Gender" "Same" "Type" "Exercise"}, {}]
                  :template-id     "7dd2479d-e829-4762-a0ac-de51a68461b5"})
@@ -61,21 +62,74 @@
   (ds/spec {:name ::db
             :spec {:observideo/filename (s/nilable string?)
                    :ui/tab              keyword?
-                   :videos/folder       (s/nilable string?) 
+                   :videos/folder       (s/nilable string?)
                    :videos/all          (s/nilable (s/map-of string? video-spec))
                    :videos/current      (s/nilable video-spec)
                    :templates/all       (s/nilable (s/map-of string? template-spec))
-                   :templates/current   (s/nilable template-spec)}})) 
+                   :templates/current   (s/nilable template-spec)}}))
 
 (defn empty-db []
   {:observideo/filename nil
    :ui/tab              :videos
 
    ;; videos list is a vec because they are in the filesystem
-   :videos/folder       nil ;;string
-   :videos/all          nil ;;map {filename > video}
-   :videos/current      nil ;;video
+   :videos/folder       nil                                 ;;string
+   :videos/all          nil                                 ;;map {filename > video}
+   :videos/current      nil                                 ;;video
 
    ;; templates are keyed by :id because it facilitates CRUD operations
    :templates/all       {(:id demo-template) demo-template} ;; {uuid -> template}
    :templates/current   nil})                               ;; template
+
+;;;;
+;; Data export facilities
+(defn- observation->index0
+  "Maps observations to 0-based indexes according to template, or -1 if not found"
+  [template observation]
+  (mapv (fn [[attr val]]
+          (let [values (get-in template [attr :values])
+                idx    (.indexOf values val)]
+            (when (and (some? val) (< idx 0))
+              (log/warnf "template %s: Failed to find index for attr %s value %s" template attr val))
+            ;; nil -> nil
+            ;; "xxx" -> index
+            ;; notfound -> -1
+            (or (and val idx)
+              nil)))
+    observation))
+
+
+(defn observation->index1
+  "1-based version ov observation->index0, keeping -1 for not found"
+  [template observation]
+  (mapv #(if (>= % 0) (inc %) %)
+    (observation->index0 template observation)))
+
+
+(defn- video->csv
+  "Exports the video data as csv. Exposes a map"
+  [{:keys [attributes] :as template}
+   {:keys [observations filename] :as video}]
+  (let [headers           (keys attributes)
+        observation-vals  (mapv #(into [] (vals %)) observations)
+        observations-idx0 (mapv #(observation->index0 attributes %) observations)
+        observations-idx1 (mapv #(observation->index1 attributes %) observations)]
+    {:filename  filename
+     :by-name   (concat [headers] observation-vals)
+     :by-index0 (concat [headers] observations-idx0)
+     :by-index1 (concat [headers] observations-idx1)}))
+
+
+(defn db->csv
+  "Exports the database as a csv"
+  [database]
+  (let [{videos :videos/all templates :templates/all} database]
+    (for [vid (keys videos)
+          :let [video       (get videos vid)
+                template-id (get video :template-id)
+                template    (get templates template-id)]
+          :when (some? template)]
+      (video->csv template video))))
+
+(comment
+  (db->csv (observideo.main.db/read-db)))

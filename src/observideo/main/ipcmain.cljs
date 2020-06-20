@@ -5,7 +5,7 @@
     [taoensso.timbre :as log]
     [observideo.common.serde :as serde]
     ["electron" :as electron :refer [BrowserWindow remote app ipcRender ipcMain]]
-    ["electron-dl" :as electron-dl :refer [electronDl download]]
+    ["electron-dl" :as electron-dl :refer [download]]
     [promesa.core :as p]))
 
 ;;;;

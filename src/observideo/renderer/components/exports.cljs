@@ -21,24 +21,26 @@
     [antd/row {:gutter [8,8]}
      [antd/col {:span 12}
       [:div
-       [antd/button {:type "primary" :onClick #(start-export {:by :index})}
+       [antd/button {:type "primary" :onClick #(start-export {:by :index1})}
         [antd/download-icon]
-        " Export to CSV (index)"]
-       [:p "Export the data as CSV, indexed based. The resulting csv will be similar to:"]
+        " Export to CSV (index starts at 1)"]
+       [:p "Export the data as zip, with one CSV file per video. Indexed based."]
+       [:p "Each csv file will have the data with the following format"]
        [:pre"Peer,Gender
-0,0
+1,1
 1,2
-0,2
-..."]]]
+ ,2
+etc"]]]
 
      [antd/col {:span 12} 
       [:div
        [antd/button {:type "primary" :onClick #(start-export {:by :name})}
         [antd/download-icon]
         " Export to CSV (name)"]
-       [:p "Export the data as CSV, name based. The resulting csv will be similar to:"]
+       [:p "Export the data as CSV, name based."]
+       [:p "Each csv file will have the data with the following format"]
        [:pre "Peer,Gender
 Alone,Same
 Adults,Both
-..."]]]]]])
+etc"]]]]]])
 
