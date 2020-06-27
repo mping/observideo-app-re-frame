@@ -10,23 +10,7 @@
             [observideo.renderer.components.video-list :as video-list]
             [observideo.renderer.components.antd :as antd]))
 
-
 (defonce electron (js/require "electron"))
-(defonce remote (.-remote electron))
-(defonce dialog (.-dialog remote))
-
-
-;;;;
-;; actions
-
-(defn- select-dir []
-  (let [opts (clj->js {:properties ["openDirectory"]})
-        dir  (.showOpenDialog dialog opts)]
-    (-> (p/resolved dir)
-      (p/then (fn [arg]
-                (let [[dir] (aget arg "filePaths")]
-                  (rf/dispatch [:ui/update-videos-folder {:folder dir}]))))
-      (p/catch (fn [err] (log/warn err))))))
 
 ;;;;
 ;; UI

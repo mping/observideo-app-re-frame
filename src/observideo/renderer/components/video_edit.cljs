@@ -11,9 +11,6 @@
 
 
 (defonce electron (js/require "electron"))
-(defonce remote (.-remote electron))
-(defonce dialog (.-dialog remote))
-
 
 (defn- select-template [video id]
   (rf/dispatch [:ui/update-current-video-template (str id)]))
@@ -34,7 +31,7 @@
          [:tr nil
           (concat (map-indexed (fn [i [header v]]
                                  [:th.ant-table-cell {:key (:index v)} (name header)])
-                    sorted-attrs))]]
+                               sorted-attrs))]]
 
         [:tbody.ant-table-tbody
          [:tr nil
@@ -55,7 +52,7 @@
 
                  [:tr {:key rowkey}
                   [:td {:key     tdkey
-                        :style {:background (when attribute-on? "#1890ff")}
+                        :style   {:background (when attribute-on? "#1890ff")}
                         :onClick #(rf/dispatch [:ui/update-current-video-current-section-observation
                                                 (assoc observation header attribute)])}
                    attribute]])]]])]]]]]]))
@@ -68,8 +65,8 @@
         ;; these are "local component state"
         ;; some can be used to re-trigger a render (r/atom)
         ;; others are just vars (clojure.core/atom)
-        !video-player  (clojure.core/atom nil)
-        !step-interval (clojure.core/atom 1)
+        !video-player  (atom nil)
+        !step-interval (atom 1)
         video-section  (r/atom 0)
         video-time     (r/atom 0)]
 
@@ -79,7 +76,7 @@
       (let [section           @(rf/subscribe [:videos/current-section])
             selected-template @(rf/subscribe [:videos/current-template])
             num-observations  (+ (int (/ duration @!step-interval))
-                                (if (> (mod duration @!step-interval) 0) 1 0))]
+                                 (if (> (mod duration @!step-interval) 0) 1 0))]
 
         (reset! !step-interval (get selected-template :interval 1))
 
@@ -95,16 +92,16 @@
                                  :ref         (fn [el]
                                                 (when (some? el)
                                                   (.subscribeToStateChange el
-                                                    (fn [jsobj]
-                                                      (let [secs      (.-currentTime jsobj)
-                                                            previndex @video-section
-                                                            index     (int (/ secs @!step-interval))]
-                                                        (reset! video-time secs)
-                                                        (reset! video-section index)
-                                                        (rf/dispatch [:ui/update-current-video-section secs index])
-                                                        ;; auto-pause when the section changes
-                                                        (when (not= previndex index)
-                                                          (.pause el)))))
+                                                                           (fn [jsobj]
+                                                                             (let [secs      (.-currentTime jsobj)
+                                                                                   previndex @video-section
+                                                                                   index     (int (/ secs @!step-interval))]
+                                                                               (reset! video-time secs)
+                                                                               (reset! video-section index)
+                                                                               (rf/dispatch [:ui/update-current-video-section secs index])
+                                                                               ;; auto-pause when the section changes
+                                                                               (when (not= previndex index)
+                                                                                 (.pause el)))))
                                                   (reset! !video-player el)))}]]
 
           ;;;;
@@ -132,8 +129,7 @@
            ;; affix sticks it on top
            [antd/affix {}
             [observation-table]]]]
-         #_#_
-         [:hr]
-         [antd/row
-          [:h1 "Here:" (:time section) "|" (:index section)]]]))))
+         #_#_[:hr]
+             [antd/row
+              [:h1 "Here:" (:time section) "|" (:index section)]]]))))
 
