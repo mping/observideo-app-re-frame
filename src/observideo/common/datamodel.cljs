@@ -12,7 +12,6 @@
                                  "Type"   {:index 2 :values ["Roleplay" "Rough and Tumble" "Exercise"]}}})
 
 
-
 (def demo-video {:filename        "/home/mping/Download … deo_720x480_30mb.mp4"
                  :duration        183.318
                  :info            {:a "changeme"}
@@ -22,6 +21,10 @@
                  :current-section {:time 0, :index 0}
                  :observations    [{"Peer" nil "Gender" "Same" "Type" "Exercise"}, {}]
                  :template-id     "7dd2479d-e829-4762-a0ac-de51a68461b5"})
+
+(def demo-query {:aggregator "some_video_prefix_aggregator"
+                 :top        {"Peer" nil "Gender" "Same" "Type" "Exercise"}
+                 :bottom     {"Peer" nil "Gender" "Same" "Type" "Exercise"}})
 
 ;;;;
 ;; Specs
@@ -79,7 +82,10 @@
 
    ;; templates are keyed by :id because it facilitates CRUD operations
    :templates/all       {(:id demo-template) demo-template} ;; {uuid -> template}
-   :templates/current   nil})                               ;; template
+   :templates/current   nil
+
+   ;;transient data, doesnt need to be persisteed
+   :query/current       nil})                               ;; query
 
 ;;;;
 ;; Data export facilities

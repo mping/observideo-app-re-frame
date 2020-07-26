@@ -1,6 +1,7 @@
 (ns observideo.renderer.subs
   (:require [re-frame.core :as rf :refer [reg-sub subscribe]]
-            [reagent.ratom :as r :refer-macros [reaction]]))
+            [reagent.ratom :as r :refer-macros [reaction]]
+            [taoensso.timbre :as log]))
 
 ;;;;
 ;; UI
@@ -41,12 +42,25 @@
 (rf/reg-sub-raw :templates/video-count
   (fn [db _]
     (reaction
-     (let [aggr (map :template-id (vals (get @db :videos/all)))
-           cnt  (frequencies aggr)]
-        cnt))))
+      (let [aggr (map :template-id (vals (get @db :videos/all)))
+            cnt  (frequencies aggr)]
+         cnt))))
 
 (rf/reg-sub :templates/all
   (fn [db _] (:templates/all db)))
 
 (rf/reg-sub :templates/current
   (fn [db _] (:templates/current db)))
+
+;;;;
+;; queries
+
+(rf/reg-sub :query/current
+  (fn [db _] (:query/current db)))
+
+(rf/reg-sub :query/result
+  (fn [db _]
+    (let [{:keys [aggregator top bottom]} (:query/current db)]
+      (log/info top)
+      {:top    [(vals top)    5 (keys (get-in db [:videos/all]))]
+       :bottom [(vals bottom) 3 (keys (get-in db [:videos/all]))]})))

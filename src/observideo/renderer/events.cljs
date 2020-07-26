@@ -36,7 +36,7 @@
                   newvideo (get newm filename)
                   missing? (nil? newvideo)
                   same?    (= (:md5sum newvideo)
-                              (:md5sum oldvideo))
+                             (:md5sum oldvideo))
                   video    (if (or same? missing?) oldvideo newvideo)
                   video    (assoc video :missing? missing?)]]
         ;; if the video is the same, keep the data
@@ -189,3 +189,13 @@
   :db/export
   [interceptors/event->ipc]
   (fn [db _] db))
+
+;;;;
+;; queries
+(rf/reg-event-db
+  :query/update
+  (fn [db [_ aggregator top-selection bottom-selection]]
+    (js/console.log "QUERY/UPDATE")
+    (assoc db :query/current {:top        top-selection
+                              :bottom     bottom-selection
+                              :aggregator aggregator})))

@@ -2,44 +2,81 @@
   (:require [observideo.renderer.components.antd :as antd]
             [re-frame.core :as rf]
             [taoensso.timbre :as log]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [clojure.string :as str]
+            [observideo.common.utils :as utils]))
 
-(defn- select-template-values
-  "Draws a row of [select1] [...] [selectN] dropdowns,
-  one for each template attribute."
-  [{:keys [attributes] :as template}
-   {:keys [on-change]}]
-  [:table
-   [:tbody
-    [:tr
-     (for [[k v] attributes
-           :let [vals (:values v)]]
-       [:td
-        [:b k]
-        [antd/select {:onChange #(on-change k %) :allowClear true}
-         (for [opt vals]
-           [antd/option {:key opt} opt])]])]]])
+(defn- render-row [[values cnt videos]]
+  [:div
+   [:span (str/join ", " (filter identity values))]
+   [:p cnt]
+   [:ul
+    (for [v videos]
+      [:li (utils/fname v)])]])
+
+(defn- render-result [{:keys [top bottom]}]
+  [:div
+   (render-row top)
+   [:hr]
+   (render-row bottom)])
 
 (defn ui
   []
   (let [templates-map     @(rf/subscribe [:templates/all])
         templates         (vals templates-map)
+
         ;; local state
         current-template! (r/atom nil)
-        on-change-num (fn [k v] (log/info "num" k v))
-        on-change-den (fn [k v] (log/info "den" k v))]
+        top-selection!    (r/atom {})
+        bottom-selection! (r/atom {})
+        make-selection    (fn [t]
+                            (let [attributes (:attributes t)]
+                              (reduce (fn [acc k] (assoc acc k nil)) {} (keys attributes))))]
+
+    ;; form-2 component
     (fn []
-      [:div
-       [:h1 "Queries"]
-       ;; select a component
-       [antd/select {:onChange     #(reset! current-template! (get templates-map %))}
-        (for [tmpl templates
-              :let [{:keys [id name]} tmpl]]
-          [antd/option {:key id} name])]
-       [:p "Select a template"]
+      (let [query-result    @(rf/subscribe [:query/result])
+            current-query   @(rf/subscribe [:query/current])
+            attributes      (:attributes @current-template!)
+            aggregation     "some_video_prefix_aggregator"
+            dispatch-update (fn [r k v]
+                              (swap! r assoc k v)
+                              (rf/dispatch [:query/update aggregation @top-selection! @bottom-selection!]))]
+        (log/info "RE-RENDER QUERIES" query-result)
 
-       [:hr]
-       (select-template-values @current-template! {:on-change on-change-num})
+        [:div
+         [:h1 "Queries"]
+         ;; select a component
+         [antd/select {:onChange #(do (reset! current-template! (get templates-map %))
+                                      (reset! top-selection! (make-selection @current-template!))
+                                      (reset! bottom-selection! (make-selection @current-template!)))}
+          (for [tmpl templates
+                :let [{:keys [id name]} tmpl]]
+            [antd/option {:key id} name])]
+         [:p "Select a template"]
 
-       [:hr]
-       (select-template-values @current-template! {:on-change on-change-den})])))
+         [:div
+          [:table
+           [:tbody
+            [:tr
+             (for [[k v] attributes
+                   :let [vals (:values v)]]
+               [:td {:key k}
+                [:b k " "]
+                [antd/select {:onChange #(dispatch-update top-selection! k %) :allowClear true}
+                 (for [opt vals]
+                   [antd/option {:key opt} opt])]])]]]
+          [:hr]
+          [:table
+           [:tbody
+            [:tr
+             (for [[k v] attributes
+                   :let [vals (:values v)]]
+               [:td {:key k}
+                [:b k " "]
+                [antd/select {:onChange #(dispatch-update bottom-selection! k %) :allowClear true}
+                 (for [opt vals]
+                   [antd/option {:key opt} opt])]])]]]
+          [:hr]
+          [:h3 "Result"]
+          (render-result query-result)]]))))
