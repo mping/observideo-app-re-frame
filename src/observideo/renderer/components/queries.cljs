@@ -20,6 +20,8 @@
    [:hr]
    (render-row bottom)])
 
+(def indifferent "-indifferent-")
+
 (defn ui
   []
   (let [templates-map     @(rf/subscribe [:templates/all])
@@ -40,9 +42,9 @@
             attributes      (:attributes @current-template!)
             aggregation     "some_video_prefix_aggregator"
             dispatch-update (fn [r k v]
-                              (swap! r assoc k v)
-                              (rf/dispatch [:query/update aggregation @top-selection! @bottom-selection!]))]
-        (log/info "RE-RENDER QUERIES" query-result)
+                              (let [proper-value (if (= v indifferent) nil v)]
+                                (swap! r assoc k proper-value)
+                                (rf/dispatch [:query/update (:id @current-template!) aggregation @top-selection! @bottom-selection!])))]
 
         [:div
          [:h1 "Queries"]
@@ -63,7 +65,10 @@
                    :let [vals (:values v)]]
                [:td {:key k}
                 [:b k " "]
-                [antd/select {:onChange #(dispatch-update top-selection! k %) :allowClear true}
+                [antd/select {:onChange #(dispatch-update top-selection! k %)
+                              :allowClear false
+                              :defaultValue indifferent}
+                 [antd/option {:key :-indifferent-} indifferent]
                  (for [opt vals]
                    [antd/option {:key opt} opt])]])]]]
           [:hr]
@@ -74,7 +79,10 @@
                    :let [vals (:values v)]]
                [:td {:key k}
                 [:b k " "]
-                [antd/select {:onChange #(dispatch-update bottom-selection! k %) :allowClear true}
+                [antd/select {:onChange #(dispatch-update bottom-selection! k %)
+                              :allowClear false
+                              :defaultValue indifferent}
+                 [antd/option {:key :indifferent} indifferent]
                  (for [opt vals]
                    [antd/option {:key opt} opt])]])]]]
           [:hr]

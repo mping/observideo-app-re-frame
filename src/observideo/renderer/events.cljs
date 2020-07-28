@@ -194,8 +194,9 @@
 ;; queries
 (rf/reg-event-db
   :query/update
-  (fn [db [_ aggregator top-selection bottom-selection]]
-    (js/console.log "QUERY/UPDATE")
-    (assoc db :query/current {:top        top-selection
-                              :bottom     bottom-selection
-                              :aggregator aggregator})))
+  (fn [db [_ template-id aggregator top-selection bottom-selection]]
+    (assoc db :query/current {:template-id template-id
+                              :aggregator  aggregator
+                              :top         top-selection
+                              :bottom      bottom-selection})))
+                              

@@ -22,9 +22,10 @@
                  :observations    [{"Peer" nil "Gender" "Same" "Type" "Exercise"}, {}]
                  :template-id     "7dd2479d-e829-4762-a0ac-de51a68461b5"})
 
-(def demo-query {:aggregator "some_video_prefix_aggregator"
-                 :top        {"Peer" nil "Gender" "Same" "Type" "Exercise"}
-                 :bottom     {"Peer" nil "Gender" "Same" "Type" "Exercise"}})
+(def demo-query {:template-id "fb52dd46-85cc-4864-b11e-44b8a5b28331"
+                 :aggregator  "some_video_prefix_aggregator"
+                 :top         {"Peer" nil "Gender" "Same" "Type" "Exercise"}
+                 :bottom      {"Peer" nil "Gender" "Same" "Type" "Exercise"}})
 
 ;;;;
 ;; Specs
