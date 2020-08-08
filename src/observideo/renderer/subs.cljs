@@ -73,9 +73,8 @@
                                        (assoc m k v))) {} %)
           observations (prune obs)
           query        (prune qry)]
-      ;; maps are converted to #{[k v] .. [k v]}
-      (js/console.log observations)
-      (js/console.log query)
+      ;; maps are converted to #{[k v] .. [k v]} so the can match based on element equality
+      ;; [k1 v1] == [k2 v2]
       (set/subset? (set query)
                    (set observations)))))
 
@@ -83,30 +82,24 @@
   (matches? {"Peer" "Alone" "Gender" "Male"} {"Peer" "Alone" "Gender" nil})) ;;true
 
 (defn- run-query
-  "Returns a vector [query num-of-observations videos]
-   Example: [ (\"Alone, Group\") 5 (\"SampleVideo.mpg\" \"OtherVideo.mpg\")]
+  "Returns a vector [query {video num-of-observations}]
+   Example: [ (\"Alone, Group\") {\"SampleVideo.mpg\" 5 \"OtherVideo.mpg\" 1}]
 "
   [videos aggregator query]
   (->> videos
        (map (fn [{:keys [filename observations]}]
               ;; [filename matches]
               [filename (count (filter #(matches? % query) observations))]))
-       ;; sum all matching results
-       (reduce (fn [[tot vids] [f c]]
-                 [(+ tot c) (conj vids f)])
-               [0 []])
-       ;; Add the query
-       (cons (->> query vals (filter identity)))))
-               
+       (filter (fn [[v c]] (> c 0)))
+       (into {})))
 
-#_
-(let [db @re-frame.db/app-db      
+(let [db @re-frame.db/app-db
       {:keys [template-id aggregator top bottom]} (:query/current db)
       videos (:videos/all db)
       videos (filter #(= template-id (:template-id %)) (vals videos))]
   (def *v videos)
   (def *q top)
-  (run-query videos aggregator top))
+  (run-query videos aggregator bottom))
 
 ;; TODO FIXME
 ;; should actually return
@@ -117,5 +110,5 @@
     (let [{:keys [template-id aggregator top bottom]} (:query/current db)
           videos (:videos/all db)
           videos (filter #(= template-id (:template-id %)) (vals videos))]
-      {:top    (run-query videos aggregator top)
-       :bottom [(vals bottom) 3 (keys (get-in db [:videos/all]))]})))
+      {:top    [(vals top)    (run-query videos aggregator top)]
+       :bottom [(vals bottom) (run-query videos aggregator bottom)]})))

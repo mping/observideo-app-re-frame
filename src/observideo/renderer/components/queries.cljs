@@ -6,13 +6,18 @@
             [clojure.string :as str]
             [observideo.common.utils :as utils]))
 
-(defn- render-row [[values cnt videos]]
-  [:div
-   [:span (str/join ", " (filter identity values))]
-   [:p cnt]
-   [:ul
-    (for [v videos]
-      [:li (utils/fname v)])]])
+(defn- render-row [[values videos]]
+  (let [query-vals (map #(or % "<empty>") values)
+        totals     (apply + (map (fn [[_ c]] c) videos))
+        datasource (mapv (fn [[v c]] {:v v :c c :key v}) videos)
+        datasource (conj datasource {:v "Total" :c totals :key :total})]
+    [:div
+     [:pre (str/join "," query-vals)]
+     [antd/table {:size       "small"
+                  :dataSource datasource
+                  :columns    [{:title "Video" :dataIndex :v :key :v}
+                               {:title "Matched observations" :dataIndex :c :key :c}]}]]))
+
 
 (defn- render-result [{:keys [top bottom]}]
   [:div
@@ -86,5 +91,4 @@
                  (for [opt vals]
                    [antd/option {:key opt} opt])]])]]]
           [:hr]
-          [:h3 "Result"]
           (render-result query-result)]]))))
