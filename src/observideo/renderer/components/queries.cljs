@@ -6,26 +6,25 @@
             [clojure.string :as str]
             [observideo.common.utils :as utils]))
 
-(defn- render-row [[values videos]]
-  (let [query-vals (map #(or % "<empty>") values)
-        totals     (apply + (map (fn [[_ c]] c) videos))
-        datasource (mapv (fn [[v c]] {:v v :c c :key v}) videos)
-        datasource (conj datasource {:v "Total" :c totals :key :total})]
-    [:div
-     [:pre (str/join "," query-vals)]
-     [antd/table {:size       "small"
-                  :dataSource datasource
-                  :columns    [{:title "Video" :dataIndex :v :key :v}
-                               {:title "Matched observations" :dataIndex :c :key :c}]}]]))
+(def indifferent "<empty>")
 
+(defn- render-result-row [[values videos]]
+  (let [query-vals  (map #(or % indifferent) values)
+        query-title (str "Matching: " (str/join "," query-vals))
+        totals      (apply + (map (fn [[_ c]] c) videos))
+        datasource  (mapv (fn [[v c]] {:v v :c c :key v}) videos)
+        datasource  (conj datasource {:v "Total" :c totals :key :total})]
+    [:div
+     [antd/table {:size       "medium"
+                  :dataSource datasource
+                  :columns    [{:title query-title :dataIndex :v :key :v}
+                               {:title "Matched observations" :dataIndex :c :key :c}]}]]))
 
 (defn- render-result [{:keys [top bottom]}]
   [:div
-   (render-row top)
+   (render-result-row top)
    [:hr]
-   (render-row bottom)])
-
-(def indifferent "-indifferent-")
+   (render-result-row bottom)])
 
 (defn ui
   []
@@ -70,12 +69,11 @@
                    :let [vals (:values v)]]
                [:td {:key k}
                 [:b k " "]
-                [antd/select {:onChange #(dispatch-update top-selection! k %)
-                              :allowClear false
+                [antd/select {:onChange     #(dispatch-update top-selection! k %)
+                              :allowClear   false
                               :defaultValue indifferent}
                  [antd/option {:key :-indifferent-} indifferent]
-                 (for [opt vals]
-                   [antd/option {:key opt} opt])]])]]]
+                 (for [opt vals] [antd/option {:key opt} opt])]])]]]
           [:hr]
           [:table
            [:tbody
@@ -84,11 +82,10 @@
                    :let [vals (:values v)]]
                [:td {:key k}
                 [:b k " "]
-                [antd/select {:onChange #(dispatch-update bottom-selection! k %)
-                              :allowClear false
+                [antd/select {:onChange     #(dispatch-update bottom-selection! k %)
+                              :allowClear   false
                               :defaultValue indifferent}
                  [antd/option {:key :indifferent} indifferent]
-                 (for [opt vals]
-                   [antd/option {:key opt} opt])]])]]]
+                 (for [opt vals] [antd/option {:key opt} opt])]])]]]
           [:hr]
           (render-result query-result)]]))))
