@@ -199,4 +199,9 @@
                               :aggregator  aggregator
                               :top         top-selection
                               :bottom      bottom-selection})))
-                              
+
+(rf/reg-event-db
+  :query/reset
+  (fn [db [_ template-id aggregator top-selection bottom-selection]]
+    (assoc db :query/current nil)))
+

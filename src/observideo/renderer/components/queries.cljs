@@ -39,6 +39,9 @@
                             (let [attributes (:attributes t)]
                               (reduce (fn [acc k] (assoc acc k nil)) {} (keys attributes))))]
 
+    ;; reset screen
+    (rf/dispatch [:query/reset])
+
     ;; form-2 component
     (fn []
       (let [query-result    @(rf/subscribe [:query/result])
