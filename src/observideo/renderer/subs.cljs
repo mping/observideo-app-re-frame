@@ -93,17 +93,14 @@
        (filter (fn [[v c]] (> c 0)))
        (into {})))
 
-(let [db @re-frame.db/app-db
-      {:keys [template-id aggregator top bottom]} (:query/current db)
-      videos (:videos/all db)
-      videos (filter #(= template-id (:template-id %)) (vals videos))]
-  (def *v videos)
-  (def *q top)
-  (run-query videos aggregator bottom))
-
-;; TODO FIXME
-;; should actually return
-;; [query {cnt1 video1 cnt2 video2 ...}]
+(comment
+  (let [db     @re-frame.db/app-db
+        {:keys [template-id aggregator top bottom]} (:query/current db)
+        videos (:videos/all db)
+        videos (filter #(= template-id (:template-id %)) (vals videos))]
+    (def *v videos)
+    (def *q top)
+    (run-query videos aggregator bottom)))
 
 (rf/reg-sub :query/result
   (fn [db _]
