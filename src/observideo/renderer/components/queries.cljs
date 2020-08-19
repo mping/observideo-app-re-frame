@@ -15,7 +15,7 @@
         datasource  (mapv (fn [[v c]] {:v v :c c :key v}) videos)
         datasource  (conj datasource {:v "Total" :c totals :key :total})]
     [:div
-     [antd/table {:size       "medium"
+     [antd/table {:size       "small"
                   :dataSource datasource
                   :columns    [{:title query-title :dataIndex :v :key :v}
                                {:title "Matched observations" :dataIndex :c :key :c}]}]]))
@@ -58,7 +58,8 @@
          ;; select a component
          [antd/select {:onChange #(do (reset! current-template! (get templates-map %))
                                       (reset! top-selection! (make-selection @current-template!))
-                                      (reset! bottom-selection! (make-selection @current-template!)))}
+                                      (reset! bottom-selection! (make-selection @current-template!))
+                                      (rf/dispatch [:query/update (:id @current-template!) aggregation @top-selection! @bottom-selection!]))}
           (for [tmpl templates
                 :let [{:keys [id name]} tmpl]]
             [antd/option {:key id} name])]
@@ -75,7 +76,7 @@
                 [antd/select {:onChange     #(dispatch-update top-selection! k %)
                               :allowClear   false
                               :defaultValue indifferent}
-                 [antd/option {:key :-indifferent-} indifferent]
+                 [antd/option {:key indifferent} indifferent]
                  (for [opt vals] [antd/option {:key opt} opt])]])]]]
           [:hr]
           [:table
@@ -88,7 +89,7 @@
                 [antd/select {:onChange     #(dispatch-update bottom-selection! k %)
                               :allowClear   false
                               :defaultValue indifferent}
-                 [antd/option {:key :indifferent} indifferent]
+                 [antd/option {:key indifferent} indifferent]
                  (for [opt vals] [antd/option {:key opt} opt])]])]]]
           [:hr]
           (render-result query-result)]]))))

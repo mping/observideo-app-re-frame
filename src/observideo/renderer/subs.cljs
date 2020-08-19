@@ -100,6 +100,8 @@
         videos (filter #(= template-id (:template-id %)) (vals videos))]
     (def *v videos)
     (def *q top)
+    bottom
+    #_
     (run-query videos aggregator bottom)))
 
 (rf/reg-sub :query/result

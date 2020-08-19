@@ -75,10 +75,11 @@
       ;; trigger re-render when some attr on the video changes
       (let [section           @(rf/subscribe [:videos/current-section])
             selected-template @(rf/subscribe [:videos/current-template])
-            num-observations  (+ (int (/ duration @!step-interval))
-                                 (if (> (mod duration @!step-interval) 0) 1 0))]
+            initial-interval  (get selected-template :interval 1)
+            num-observations  (+ (int (/ duration initial-interval))
+                                 (if (> (mod duration initial-interval) 0) 1 0))]
 
-        (reset! !step-interval (get selected-template :interval 1))
+        (reset! !step-interval initial-interval)
 
         [:div
          [antd/row {:gutter [8, 8]}

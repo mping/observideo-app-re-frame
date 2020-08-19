@@ -40,7 +40,7 @@
 
 (defn read-dir [dir]
   ;; TODO check if directory exists
-  (let [extensions #{".mp4" ".avi"}
+  (let [extensions #{".mp4" ".avi" ".webm"}
         patterns   (map #(str dir "/**/*" %) extensions)
         normalized (map normalize-path patterns)
         result     (fast-glob (clj->js normalized))]
