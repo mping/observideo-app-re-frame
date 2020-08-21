@@ -60,7 +60,6 @@
       (log/warn "Updating with invalid data")
       (s/explain datamodel/db-spec resetted))
     ;; lame, should be async
-    (log/info wrapped)
     (fs/writeFileSync db-file (t/write writer wrapped))))
 
 ;; debounced version
