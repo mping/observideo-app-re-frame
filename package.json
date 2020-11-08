@@ -1,7 +1,7 @@
 {
   "name": "observideo",
   "homepage": "https://observideo.com",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Observideo is an app for categorizing video segments",
   "main": "resources/main.js",
   "scripts": {
@@ -20,6 +20,10 @@
     "mac": {
       "category": "public.app-category.education"
     },
+    "publish": [{
+        "provider": "github",
+        "releaseType": "release"
+      }],
     "dmg": {
       "contents": [
         {
