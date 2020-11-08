@@ -60,7 +60,10 @@
       (log/warn "Updating with invalid data")
       (s/explain datamodel/db-spec resetted))
     ;; lame, should be async
-    (fs/writeFileSync db-file (t/write writer wrapped))))
+    (let [res (fs/writeFileSync db-file (t/write writer wrapped))]
+      (log/infof "Finished updating db at %s" db-file)
+      res)))
+
 
 ;; debounced version
 (def overwrite (goog.functions.debounce overwrite* 500))

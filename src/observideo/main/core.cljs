@@ -3,7 +3,7 @@
    [observideo.main.ipcmain :as ipc]
    [observideo.main.db :as db]
    ["electron" :as electron :refer [ipcMain app BrowserWindow crashReporter]]
-   ["electron-dl" :as electron-dl ]))
+   ["electron-dl" :as electron-dl]))
 
 (def electron (js/require "electron"))
 (def app  (.-app electron))
@@ -87,7 +87,8 @@
 (defn init []
   (electron-dl)
   (init-menu)
-  (if-not is-development? (.setApplicationMenu menu nil))
+  ;; always set app menu 
+  ;(if-not is-development? (.setApplicationMenu menu nil))
   (init-db)
   (init-browser-window))
 
