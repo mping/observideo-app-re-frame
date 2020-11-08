@@ -1,7 +1,7 @@
 {
   "name": "observideo",
   "homepage": "https://observideo.com",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Observideo is an app for categorizing video segments",
   "main": "resources/main.js",
   "scripts": {
@@ -53,8 +53,7 @@
     "electron": "^8.2.5",
     "electron-builder": "^22.6.0",
     "shadow-cljs": "^2.8.89",
-    "source-map-support": "^0.4.18",
-    "ws": "^3.2.0"
+    "source-map-support": "^0.4.18"
   },
   "dependencies": {
     "antd": "4.0.0-alpha.14",
@@ -74,6 +73,7 @@
     "react-flip-move": "^3.0.4",
     "react-highlight.js": "^1.0.7",
     "regenerator-runtime": "^0.13.5",
-    "video-react": "^0.14.1"
+    "video-react": "^0.14.1",
+    "ws": "^3.2.0"
   }
 }

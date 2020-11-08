@@ -87,7 +87,7 @@
 (defn init []
   (electron-dl)
   (init-menu)
-  ;; always set app menu 
+  ;; always set app menu
   ;(if-not is-development? (.setApplicationMenu menu nil))
   (init-db)
   (init-browser-window))
