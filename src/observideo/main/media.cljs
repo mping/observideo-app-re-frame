@@ -43,7 +43,7 @@
   (let [extensions #{".mp4" ".avi" ".webm"}
         patterns   (map #(str dir "/**/*" %) extensions)
         normalized (map normalize-path patterns)
-        result     (fast-glob (clj->js normalized))]
+        result     (fast-glob (clj->js normalized) #js {:caseSensitiveMatch false})]
     (log/debug "Reading directory with patterns" normalized)
     (-> result
         (.then #(do (log/infof "Read files %s" %) %))
