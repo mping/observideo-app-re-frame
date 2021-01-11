@@ -1,9 +1,7 @@
 ;; shadow-cljs configuration
 {:source-paths ["src"]
 
- :dependencies [[org.clojure/clojurescript" 1.10.741"]
-                [thheller/shadow-cljs "2.8.83"]
-                [funcool/promesa "5.1.0"]
+ :dependencies [[funcool/promesa "5.1.0"]
                 [com.taoensso/timbre "4.10.0"]
                 [reagent "0.8.1"]
                 [re-frame "0.10.5"]
