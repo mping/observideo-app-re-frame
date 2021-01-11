@@ -3,13 +3,13 @@
   "homepage": "https://observideo.com",
   "version": "0.0.15",
   "description": "Observideo is an app for categorizing video segments",
-  "license" : "GPL-3.0",
+  "license": "MIT",
   "main": "resources/main.js",
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
     "dev": "shadow-cljs watch main renderer",
-    "build": "shadow-cljs compile main renderer",
-    "release": "shadow-cljs release main renderer",
+    "build-dev": "shadow-cljs compile main renderer",
+    "build": "shadow-cljs release main renderer",
     "pom": "shadow-cljs pom",
     "clean": "rm -rf resources/public/js/* && rm -rf target",
     "start": "electron .",
@@ -37,10 +37,12 @@
         "!node_modules/ffprobe-static-electron/bin/linux${/*}"
       ]
     },
-    "publish": [{
+    "publish": [
+      {
         "provider": "github",
         "releaseType": "release"
-      }],
+      }
+    ],
     "dmg": {
       "contents": [
         {
@@ -87,7 +89,6 @@
   },
   "keywords": [],
   "author": "Miguel Ping <miguel.ping@gmail.com>",
-  "license": "MIT",
   "devDependencies": {
     "electron": "^8.5.2",
     "electron-builder": "^22.6.0",
@@ -107,6 +108,7 @@
     "md5-file": "^5.0.0",
     "normalize-path": "^3.0.0",
     "rc-field-form": "0.0.0-alpha.16",
+    "rc-util": "^5.6.6",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-flip-move": "^3.0.4",
