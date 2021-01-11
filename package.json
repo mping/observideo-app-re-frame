@@ -1,7 +1,7 @@
 {
   "name": "observideo",
   "homepage": "https://observideo.com",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Observideo is an app for categorizing video segments",
   "license" : "GPL-3.0",
   "main": "resources/main.js",
@@ -19,8 +19,23 @@
   },
   "build": {
     "appId": "com.observideo.app",
+    "files": [
+      "resources/**/*",
+      "node_modules/ffmpeg-static-electron/bin/${os}/${arch}/ffmpeg",
+      "node_modules/ffmpeg-static-electron/index.js",
+      "node_modules/ffmpeg-static-electron/package.json",
+      "node_modules/ffprobe-static-electron/bin/${os}/${arch}/ffmpeg",
+      "node_modules/ffprobe-static-electron/index.js",
+      "node_modules/ffprobe-static-electron/package.json"
+    ],
     "mac": {
-      "category": "public.app-category.education"
+      "category": "public.app-category.education",
+      "files": [
+        "!node_modules/ffmpeg-static-electron/bin/win${/*}",
+        "!node_modules/ffmpeg-static-electron/bin/linux${/*}",
+        "!node_modules/ffprobe-static-electron/bin/win${/*}",
+        "!node_modules/ffprobe-static-electron/bin/linux${/*}"
+      ]
     },
     "publish": [{
         "provider": "github",
@@ -44,11 +59,29 @@
       "target": [
         "AppImage",
         "deb"
+      ],
+      "files": [
+        "!node_modules/ffmpeg-static-electron/bin/linux/ia32${/*}",
+        "!node_modules/ffmpeg-static-electron/bin/win${/*}",
+        "!node_modules/ffmpeg-static-electron/bin/mac${/*}",
+        "!node_modules/ffprobe-static-electron/bin/linux/ia32${/*}",
+        "!node_modules/ffprobe-static-electron/bin/win${/*}",
+        "!node_modules/ffprobe-static-electron/bin/mac${/*}"
       ]
     },
     "win": {
       "target": "nsis",
-      "icon": "build/icon.ico"
+      "icon": "build/icon.ico",
+      "files": [
+        "node_modules/ffmpeg-static-electron/bin/win/${arch}/ffmpeg",
+        "!node_modules/ffmpeg-static-electron/bin/win/ia32${/*}",
+        "!node_modules/ffmpeg-static-electron/bin/linux${/*}",
+        "!node_modules/ffmpeg-static-electron/bin/mac${/*}",
+        "node_modules/ffprobe-static-electron/bin/win/${arch}/ffprobe",
+        "!node_modules/ffprobe-static-electron/bin/win/ia32${/*}",
+        "!node_modules/ffprobe-static-electron/bin/linux${/*}",
+        "!node_modules/ffprobe-static-electron/bin/mac${/*}"
+      ]
     },
     "nsis": {}
   },

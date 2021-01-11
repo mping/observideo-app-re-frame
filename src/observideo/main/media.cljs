@@ -2,6 +2,7 @@
   (:require 
    [clojure.walk :as walk]
    [taoensso.timbre :as log]
+   ["path" :as path]
    ["normalize-path" :as normalize-path]
    ["fast-glob" :as fast-glob]
    ["fluent-ffmpeg" :as ffmpeg-command]
@@ -16,6 +17,16 @@
 ;; https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#ffmpeg-and-ffprobe
 (.setFfprobePath ffmpeg-command (.-path ffprobe-static-electron))
 (.setFfmpegPath ffmpeg-command (.-path ffmpeg-static-electron))
+
+;; https://github.com/joshwnj/ffprobe-static/issues/5
+(comment
+	(if (not (.includes (js* "__dirname") ".asar"))
+	  (do
+	  	(.setFfprobePath ffmpeg-command (.-path ffprobe-static-electron)))
+
+	  (let [ext    (if (= (.-platform js/process) "win32") ".exe" "")
+	        ffpath (.join path (str (.-resourcesPath js/process) "/ffprobe" ext))]
+	  	 (.setFfprobePath ffmpeg-command (str (.-path ffprobe-static-electron) ext)))))
 
 (defn checksum [{:strs [filename] :as video}]
   (assoc video "md5sum" (.sync md5 filename)))
