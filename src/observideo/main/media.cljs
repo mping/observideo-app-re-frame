@@ -20,13 +20,13 @@
 
 ;; https://github.com/joshwnj/ffprobe-static/issues/5
 (comment
-	(if (not (.includes (js* "__dirname") ".asar"))
-	  (do
-	  	(.setFfprobePath ffmpeg-command (.-path ffprobe-static-electron)))
+		(if (not (.includes (js* "__dirname") ".asar"))
+		  (do
+		  	(.setFfprobePath ffmpeg-command (.-path ffprobe-static-electron)))
 
-	  (let [ext    (if (= (.-platform js/process) "win32") ".exe" "")
-	        ffpath (.join path (str (.-resourcesPath js/process) "/ffprobe" ext))]
-	  	 (.setFfprobePath ffmpeg-command (str (.-path ffprobe-static-electron) ext)))))
+		  (let [ext    (if (= (.-platform js/process) "win32") ".exe" "")
+		        ffpath (.join path (str (.-resourcesPath js/process) "/ffprobe" ext))]
+		  	 (.setFfprobePath ffmpeg-command (str (.-path ffprobe-static-electron) ext)))))
 
 (defn checksum [{:strs [filename] :as video}]
   (assoc video "md5sum" (.sync md5 filename)))
