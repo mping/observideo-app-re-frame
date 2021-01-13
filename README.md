@@ -18,3 +18,21 @@ yarn start
 yarn build
 yarn dist-mwl ;; or yarn dist
 ```
+
+## building locally on win|linux
+
+```
+docker run --rm -ti \ --env ELECTRON_CACHE="/root/.cache/electron" \
+--env ELECTRON_BUILDER_CACHE="/root/.cache/electron-builder" \
+-v ${PWD}:/project \
+ -v ${PWD##*/}-node-modules:/project/node_modules \
+ -v ~/.cache/electron:/root/.cache/electron \
+ -v ~/.cache/electron-builder:/root/.cache/electron-builder \
+ electronuserland/builder:wine
+```
+
+then you can build (requires java) and dist:
+```
+yarn build
+yarn dist -wl
+```

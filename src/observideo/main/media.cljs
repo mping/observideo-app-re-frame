@@ -15,18 +15,30 @@
 (defonce ffmpeg-static-electron (js/require "ffmpeg-static-electron"))
 
 ;; https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#ffmpeg-and-ffprobe
-(.setFfprobePath ffmpeg-command (.-path ffprobe-static-electron))
-(.setFfmpegPath ffmpeg-command (.-path ffmpeg-static-electron))
+;(.setFfprobePath ffmpeg-command (normalize-path (.-path ffprobe-static-electron)))
+;(.setFfmpegPath ffmpeg-command (normalize-path  (.-path ffmpeg-static-electron)))
 
 ;; https://github.com/joshwnj/ffprobe-static/issues/5
-(comment
-		(if (not (.includes (js* "__dirname") ".asar"))
-		  (do
-		  	(.setFfprobePath ffmpeg-command (.-path ffprobe-static-electron)))
 
-		  (let [ext    (if (= (.-platform js/process) "win32") ".exe" "")
-		        ffpath (.join path (str (.-resourcesPath js/process) "/ffprobe" ext))]
-		  	 (.setFfprobePath ffmpeg-command (str (.-path ffprobe-static-electron) ext)))))
+(if (not (.includes (js* "__dirname") ".asar"))
+		  (do
+					
+					(log/debug "Using default ffprobe/ffmpeg paths:"  ffmpath)
+					(log/debug "ffmpeg:" (.-path ffmpeg-static-electron))
+					(log/debug "ffprobe:"  (.-path ffmpeg-static-electron))
+		  	(.setFfmpegPath  ffmpeg-command (.-path ffmpeg-static-electron))
+		  	(.setFfprobePath ffmpeg-command (.-path ffmpeg-static-electron)))
+
+		  (let [ext     (if (= (.-platform js/process) "win32") ".exe" "")
+		        ffppath (.join path (str (.-resourcesPath js/process) "/ffprobe" ext))
+		        ffmpath (.join path (str (.-resourcesPath js/process) "/ffmpeg"  ext))]
+			
+			   (log/debug "Using resources path:")
+						(log/debug "ffmpeg:"  ffmpath)
+						(log/debug "ffprobe:" ffppath)
+
+	     (.setFfmpegPath ffmpeg-command  (normalize-path ffppath))
+		  	 (.setFfprobePath ffmpeg-command (normalize-path ffmpath))))
 
 (defn checksum [{:strs [filename] :as video}]
   (assoc video "md5sum" (.sync md5 filename)))

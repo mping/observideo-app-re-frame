@@ -9,7 +9,7 @@
     "postinstall": "electron-builder install-app-deps",
     "dev": "shadow-cljs watch main renderer",
     "build-dev": "shadow-cljs compile main renderer",
-    "build": "shadow-cljs release main renderer",
+    "build": "shadow-cljs compile main renderer",
     "pom": "shadow-cljs pom",
     "clean": "rm -rf resources/public/js/* && rm -rf dist && rm -rf target",
     "start": "electron .",
@@ -21,7 +21,8 @@
     "appId": "com.observideo.app",
     "files": [
       "resources/**/*",
-      ".shadow-cljs/builds/main/{dev,release}/out/cljs-runtime",
+      ".shadow-cljs/**/*",
+
       "node_modules/ffmpeg-static-electron/bin/${os}/${arch}/ffmpeg",
       "node_modules/ffmpeg-static-electron/index.js",
       "node_modules/ffmpeg-static-electron/package.json",
@@ -36,6 +37,10 @@
         "!node_modules/ffmpeg-static-electron/bin/linux${/*}",
         "!node_modules/ffprobe-static-electron/bin/win${/*}",
         "!node_modules/ffprobe-static-electron/bin/linux${/*}"
+      ],
+      "extraResources": [
+        {"from": "node_modules/ffmpeg-static-electron/bin/mac/${arch}/ffmpeg"},
+        {"from": "node_modules/ffprobe-static-electron/bin/mac/${arch}/ffprobe"}
       ]
     },
     "publish": [
@@ -70,20 +75,30 @@
         "!node_modules/ffprobe-static-electron/bin/linux/ia32${/*}",
         "!node_modules/ffprobe-static-electron/bin/win${/*}",
         "!node_modules/ffprobe-static-electron/bin/mac${/*}"
+      ],
+      "extraResources": [
+        {"from": "node_modules/ffmpeg-static-electron/bin/linux/${arch}/ffmpeg"},
+        {"from": "node_modules/ffprobe-static-electron/bin/linux/${arch}/ffprobe"}
       ]
     },
     "win": {
       "target": "nsis",
       "icon": "build/icon.ico",
       "files": [
-        "node_modules/ffmpeg-static-electron/bin/win/${arch}/ffmpeg",
+        "resources/**/*",
+        ".shadow-cljs/**/*",
+        "node_modules/ffmpeg-static-electron/bin/win/${arch}/ffmpeg.exe",
+        "node_modules/ffprobe-static-electron/bin/win/${arch}/ffprobe.exe",
         "!node_modules/ffmpeg-static-electron/bin/win/ia32${/*}",
         "!node_modules/ffmpeg-static-electron/bin/linux${/*}",
         "!node_modules/ffmpeg-static-electron/bin/mac${/*}",
-        "node_modules/ffprobe-static-electron/bin/win/${arch}/ffprobe",
         "!node_modules/ffprobe-static-electron/bin/win/ia32${/*}",
         "!node_modules/ffprobe-static-electron/bin/linux${/*}",
         "!node_modules/ffprobe-static-electron/bin/mac${/*}"
+      ],
+      "extraResources": [
+        {"from": "node_modules/ffmpeg-static-electron/bin/win/${arch}/ffmpeg.exe"},
+        {"from": "node_modules/ffprobe-static-electron/bin/win/${arch}/ffprobe.exe"}
       ]
     },
     "nsis": {}
