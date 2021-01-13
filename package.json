@@ -11,7 +11,7 @@
     "build-dev": "shadow-cljs compile main renderer",
     "build": "shadow-cljs release main renderer",
     "pom": "shadow-cljs pom",
-    "clean": "rm -rf resources/public/js/* && rm -rf target",
+    "clean": "rm -rf resources/public/js/* && rm -rf dist && rm -rf target",
     "start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
@@ -20,8 +20,8 @@
   "build": {
     "appId": "com.observideo.app",
     "files": [
-      ".shadow-cljs/**/*",
       "resources/**/*",
+      ".shadow-cljs/builds/main/{dev,release}/out/cljs-runtime",
       "node_modules/ffmpeg-static-electron/bin/${os}/${arch}/ffmpeg",
       "node_modules/ffmpeg-static-electron/index.js",
       "node_modules/ffmpeg-static-electron/package.json",
