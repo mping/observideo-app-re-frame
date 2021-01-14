@@ -11,8 +11,8 @@
 ;;;;
 ;; general media functions
 
-(defonce ffprobe-static-electron (js/require "ffprobe-static-electron"))
-(defonce ffmpeg-static-electron (js/require "ffmpeg-static-electron"))
+(defonce ffprobe-path (.-path (js/require "ffprobe-static")))
+;; UNUSED (defonce ffmpeg-path (js/require "ffmpeg-static"))
 
 ;; https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#ffmpeg-and-ffprobe
 ;(.setFfprobePath ffmpeg-command (normalize-path (.-path ffprobe-static-electron)))
@@ -23,22 +23,25 @@
 (if (not (.includes (js* "__dirname") ".asar"))
 		  (do
 					
-					(log/debug "Using default ffprobe/ffmpeg paths:"  ffmpath)
-					(log/debug "ffmpeg:" (.-path ffmpeg-static-electron))
-					(log/debug "ffprobe:"  (.-path ffmpeg-static-electron))
-		  	(.setFfmpegPath  ffmpeg-command (.-path ffmpeg-static-electron))
-		  	(.setFfprobePath ffmpeg-command (.-path ffmpeg-static-electron)))
+					(log/debug "Using default ffprobe/ffmpeg paths:")
+					;; UNUSED (log/debug "ffmpeg:"  ffmpeg-path)
+					(log/debug "ffprobe:" ffprobe-path)
+		  	;; UNUSED (.setFfmpegPath  ffmpeg-command ffmpeg-path)
+		  	(.setFfprobePath ffmpeg-command ffprobe-path))
 
 		  (let [ext     (if (= (.-platform js/process) "win32") ".exe" "")
 		        ffppath (.join path (str (.-resourcesPath js/process) "/ffprobe" ext))
-		        ffmpath (.join path (str (.-resourcesPath js/process) "/ffmpeg"  ext))]
+		        ;; UNUSED ffmpath (.join path (str (.-resourcesPath js/process) "/ffmpeg"  ext))
+		        ]
 			
 			   (log/debug "Using resources path:")
-						(log/debug "ffmpeg:"  ffmpath)
+						;; UNUSED (log/debug "ffmpeg:"  ffmpath)
 						(log/debug "ffprobe:" ffppath)
 
-	     (.setFfmpegPath ffmpeg-command  (normalize-path ffppath))
-		  	 (.setFfprobePath ffmpeg-command (normalize-path ffmpath))))
+	     ;; UNUSED (.setFfmpegPath ffmpeg-command  (normalize-path ffmpath))
+		  	 (.setFfprobePath ffmpeg-command (normalize-path ffppath))))
+
+
 
 (defn checksum [{:strs [filename] :as video}]
   (assoc video "md5sum" (.sync md5 filename)))
