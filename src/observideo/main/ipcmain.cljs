@@ -70,11 +70,21 @@
 (defmethod handle :db/query [event sender data]
   (println "IMPLEMENT ME"))
 
+;; download fn provided by electron-dl
+(declare download)
+
 (defmethod handle :db/export [event sender data]
   (let [url (db/export-to-csv data)]
     (-> url
         (p/then #(download (current-focused-window) % #js {:saveAs true :openFolderWhenDone true}))
         (p/then #(log/infof "Export done" %)))))
+
+
+(defmethod handle :query/export [event sender data]
+  (let [url (db/export-result-to-csv data)]
+    (-> url
+      (p/then #(download (current-focused-window) % #js {:saveAs true :openFolderWhenDone true}))
+      (p/then #(log/infof "Export done" %)))))
 
 
 ;;;;

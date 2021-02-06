@@ -9,22 +9,28 @@
 (def indifferent "<empty>")
 
 (defn- render-result-row [[values videos]]
+  ;; c=count, t=total (per video)
   (let [query-vals  (map #(or % indifferent) values)
         query-title (str "Matching: " (str/join "," query-vals))
-        totals      (apply + (map (fn [[_ c]] c) videos))
-        datasource  (mapv (fn [[v c]] {:v v :c c :key v}) videos)
-        datasource  (conj datasource {:v "Total" :c totals :key :total})]
+        totals      (reduce + (map (fn [[_ [c t]]] c) videos))
+        datasource  (mapv (fn [[v [c t]]]
+                            {:v v :label (str c " of " t) :key v})
+                      videos)
+        datasource  (conj datasource {:v "Total" :label totals :key :total})]
     [:div
      [antd/table {:size       "small"
                   :dataSource datasource
                   :columns    [{:title query-title :dataIndex :v :key :v}
-                               {:title "Matched observations" :dataIndex :c :key :c}]}]]))
+                               {:title "Matched observations" :dataIndex :label :key :v}]}]]))
 
 (defn- render-result [{:keys [top bottom]}]
   [:div
    (render-result-row top)
    [:hr]
    (render-result-row bottom)])
+
+(defn- export-current-query [ query-result]
+  (rf/dispatch [:query/export query-result]))
 
 (defn ui
   []
@@ -63,7 +69,14 @@
           (for [tmpl templates
                 :let [{:keys [id name]} tmpl]]
             [antd/option {:key id} name])]
+
          [:p "Select a template"]
+         [antd/button {:size    "small"
+                       :href    "#"
+                       :onClick #(export-current-query query-result)}
+          [antd/download-icon] " export"]
+
+         [:hr]
 
          [:div
           [:table

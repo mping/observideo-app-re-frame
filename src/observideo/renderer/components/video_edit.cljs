@@ -90,7 +90,7 @@
                               :onBack #(rf/dispatch [:ui/deselect-video])}]
            [player/video-player {:playsInline true
                                  :src         (str "file://" (:filename video))
-                                 :ref         (fn [el]
+                                 :ref         (fn [^js/Player el]
                                                 (when (some? el)
                                                   (.subscribeToStateChange el
                                                                            (fn [jsobj]

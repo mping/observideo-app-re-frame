@@ -205,3 +205,9 @@
   (fn [db [_ template-id aggregator top-selection bottom-selection]]
     (assoc db :query/current nil)))
 
+
+
+(rf/reg-event-db
+  :query/export
+  [interceptors/event->ipc]
+  (fn [db _] db))

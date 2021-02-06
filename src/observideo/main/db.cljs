@@ -128,13 +128,40 @@
     #(println "resolved" %)))
 
 (defn export-to-csv
-  "Handles export requests"
+  "Handles export requests for the whole database"
   [{:keys [by] :as opts}]
   (if (nil? (#{:name :index1 :index0} by))
     (do
       (log/errorf "Unknown export format: '%s'" by)
       (p/rejected ("Unknown export format")))
     (export-to-csv* (read-db) opts)))
+
+
+;{
+;        top: [
+;              [ 'Alone', null, null ],
+;              {
+;               '/home/mping/Downloads/64bit/SampleVideo_720x480_30mb.mp4': 2,
+;               '/home/mping/Downloads/SampleVideo_720x480_30mb (copy).mp4': 1,
+;               '/home/mping/Downloads/SampleVideo_720x480_30mb.mp4': 4
+;               }
+;              ],
+;        bottom: [ [ 'Peers', null, null ], {} ]
+;        }
+
+(defn export-result-to-csv
+  "Handles export requests for query results"
+  [{:keys [top btm]}]
+  (let [[topquery top-vids-kv] top
+        [btmquery btm-vids-kv] btm]
+    ;; layout is:
+    ;; topquery
+    ;; btmquery
+    ;; for each video:
+    ;; code num    den    total  pct
+    ;; v1   topc   btmc   tot    %
+    ;; ...
+    (js/console.log top btm)))
 
 ;;;;
 ;; main

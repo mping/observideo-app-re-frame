@@ -88,10 +88,11 @@
   [videos aggregator query]
   (->> videos
        (map (fn [{:keys [filename observations]}]
-              ;; [filename matches]
-              [filename (count (filter #(matches? % query) observations))]))
-       (filter (fn [[v c]] (> c 0)))
-       (into {})))
+              ;; [filename matches total]
+              [filename (count (filter #(matches? % query) observations)) (count observations)]))
+       (filter (fn [[v c t]] (> c 0)))
+       (reduce (fn [m [v c t]] (assoc m v [c t]))
+               {})))
 
 (comment
   (let [db     @re-frame.db/app-db
