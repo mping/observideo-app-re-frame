@@ -2,6 +2,7 @@
   (:require
    [taoensso.timbre :as log]
    [cognitect.transit :as t]
+   [observideo.common.utils :as utils]
    [clojure.spec.alpha :as s]
    [clojure.string :as string]
    [observideo.common.datamodel :as datamodel]
@@ -10,7 +11,8 @@
    ["electron" :as electron :refer [ipcMain app BrowserWindow crashReporter]]
    ["fs" :as fs]
    ["jszip" :as jszip]
-   ["normalize-path" :as normalize-path]))
+   ["normalize-path" :as normalize-path]
+   [clojure.string :as str]))
 
 (def electron (js/require "electron"))
 (def app (.-app electron))
@@ -141,27 +143,59 @@
 ;        top: [
 ;              [ 'Alone', null, null ],
 ;              {
-;               '/home/mping/Downloads/64bit/SampleVideo_720x480_30mb.mp4': 2,
-;               '/home/mping/Downloads/SampleVideo_720x480_30mb (copy).mp4': 1,
-;               '/home/mping/Downloads/SampleVideo_720x480_30mb.mp4': 4
+;               '/home/mping/Downloads/64bit/SampleVideo_720x480_30mb.mp4': [2 3],
+;               '/home/mping/Downloads/SampleVideo_720x480_30mb (copy).mp4': [1 3],
+;               '/home/mping/Downloads/SampleVideo_720x480_30mb.mp4': [4 4]
 ;               }
 ;              ],
 ;        bottom: [ [ 'Peers', null, null ], {} ]
 ;        }
 
+(defn- export-result-to-csv*
+  "Exports a csv for query data
+  Returns a promise of a file with all exported data."
+  [rows]
+  (let [archive (normalize-path (str (.getPath app "temp") "/observideo-query.csv"))
+        csv-data (->> rows
+                      (mapv (fn [r] (str/join "," r)))
+                      (str/join "\n"))]
+
+    (p/create
+      (fn [resolve reject]
+        (fs/writeFile archive (clj->js csv-data)
+          (fn [err]
+            (log/infof "Exported archive %s, err? %s" archive err)
+            (if err
+              (reject err)
+              (resolve (str "file://" archive)))))))))
+
 (defn export-result-to-csv
   "Handles export requests for query results"
-  [{:keys [top btm]}]
+  [{:keys [top bottom]}]
   (let [[topquery top-vids-kv] top
-        [btmquery btm-vids-kv] btm]
+        [btmquery btm-vids-kv] bottom
+        video-names            (keys (merge top-vids-kv btm-vids-kv))
+        results                (for [vname video-names
+                                     :let [topres (get top-vids-kv vname [0 0])
+                                           btmres (get btm-vids-kv vname [0 0])
+                                           [topmatch toptot] topres
+                                           [btmmatch btmtot] btmres
+                                           abstot (max toptot btmtot)]]
+                                 (into [] (concat [(utils/fname vname)] [topmatch btmmatch abstot])))
+        export                 (into []
+                                 (concat [topquery
+                                          btmquery
+                                          []
+                                          ["Video" "Num" "Den" "Total"]]
+                                         results))]
     ;; layout is:
     ;; topquery
     ;; btmquery
     ;; for each video:
-    ;; code num    den    total  pct
-    ;; v1   topc   btmc   tot    %
+    ;; code num    den    total
+    ;; v1   topc   btmc   tot
     ;; ...
-    (js/console.log top btm)))
+    (export-result-to-csv* export)))
 
 ;;;;
 ;; main

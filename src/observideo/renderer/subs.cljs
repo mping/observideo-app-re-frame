@@ -98,7 +98,8 @@
   (let [db     @re-frame.db/app-db
         {:keys [template-id aggregator top bottom]} (:query/current db)
         videos (:videos/all db)
-        videos (filter #(= template-id (:template-id %)) (vals videos))]
+        videos (filter #(= template-id (:template-id %)) (vals videos))
+        videos (filter #(not (:missing? %)) videos)]
     (def *v videos)
     (def *q top)
     (run-query videos aggregator bottom)))
@@ -107,6 +108,7 @@
   (fn [db _]
     (let [{:keys [template-id aggregator top bottom]} (:query/current db)
           videos (:videos/all db)
-          videos (filter #(= template-id (:template-id %)) (vals videos))]
+          videos (filter #(= template-id (:template-id %)) (vals videos))
+          videos (filter #(not (:missing? %)) videos)]
       {:top    [(vals top)    (run-query videos aggregator top)]
        :bottom [(vals bottom) (run-query videos aggregator bottom)]})))

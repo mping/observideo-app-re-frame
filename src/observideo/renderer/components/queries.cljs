@@ -73,6 +73,7 @@
          [:p "Select a template"]
          [antd/button {:size    "small"
                        :href    "#"
+                       :disabled (nil? @current-template!)
                        :onClick #(export-current-query query-result)}
           [antd/download-icon] " export"]
 
